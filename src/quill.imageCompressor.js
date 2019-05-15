@@ -34,6 +34,7 @@ class imageCompressor {
     this.quill = quill;
     this.options = options;
     this.range = null;
+    this.debug = options.debug == null || options.debug == true;
 
     warnAboutOptions(options);
 
@@ -98,9 +99,11 @@ class imageCompressor {
     const head = "data:image/png;base64,";
     const fileSizeBytes = Math.round(((dataUrl.length - head.length) * 3) / 4);
     const fileSizeKiloBytes = (fileSizeBytes / 1024).toFixed(0);
-    console.log(
-      "quill.imageCompressor: estimated img size: " + fileSizeKiloBytes + " kb"
-    );
+    if (this.debug) {
+      console.log(
+        "quill.imageCompressor: estimated img size: " + fileSizeKiloBytes + " kb"
+      );
+    }
   }
 }
 
@@ -132,21 +135,23 @@ async function downscaleImage(dataUrl, newWidth, imageType, imageQuality) {
   const ctx = canvas.getContext("2d");
   ctx.drawImage(image, 0, 0, newWidth, newHeight);
   const newDataUrl = canvas.toDataURL(imageType, imageQuality);
-  console.log("quill.imageCompressor: downscaling image...", {
-    args: {
-      dataUrl,
-      newWidth,
-      imageType,
-      imageQuality
-    },
-    image,
-    oldWidth,
-    oldHeight,
-    newHeight,
-    canvas,
-    ctx,
-    newDataUrl
-  });
+  if (this.debug) {
+    console.log("quill.imageCompressor: downscaling image...", {
+      args: {
+        dataUrl,
+        newWidth,
+        imageType,
+        imageQuality
+      },
+      image,
+      oldWidth,
+      oldHeight,
+      newHeight,
+      canvas,
+      ctx,
+      newDataUrl
+    });
+  }
   return newDataUrl;
 }
 
