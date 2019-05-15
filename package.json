@@ -1,7 +1,7 @@
 {
   "name": "quill-image-compress",
   "description": "A Quill rich text editor Module which compresses images uploaded to the editor",
-  "version": "1.0.0",
+  "version": "0.0.3",
   "main": "index.js",
   "repository": "git@github.com:benwinding/quill-image-compress",
   "author": "Ben Winding <ben.winding@gmail.com>",
@@ -9,8 +9,7 @@
 	"scripts": {
 		"watch": "webpack --watch --progress --mode production",
 		"start": "webpack-dev-server --hot --port 8001",
-		"build": "webpack --mode production",
-		"publish": "npm publish"
+		"build": "webpack --mode production"
 	},
 	"keywords": [
 		"quill",
