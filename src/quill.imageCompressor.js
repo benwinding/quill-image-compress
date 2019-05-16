@@ -76,7 +76,8 @@ class imageCompressor {
           base64ImageSrc,
           this.options.maxWidth,
           this.options.imageType,
-          this.options.quality
+          this.options.quality,
+          this.debug
         );
         this.insertToEditor(base64ImageSrcNew);
       },
@@ -108,7 +109,7 @@ class imageCompressor {
 }
 
 // Take an image URL, downscale it to the given width, and return a new image URL.
-async function downscaleImage(dataUrl, newWidth, imageType, imageQuality) {
+async function downscaleImage(dataUrl, newWidth, imageType, imageQuality, debug) {
   "use strict";
   // Provide default values
   imageType = imageType || "image/jpeg";
@@ -135,7 +136,7 @@ async function downscaleImage(dataUrl, newWidth, imageType, imageQuality) {
   const ctx = canvas.getContext("2d");
   ctx.drawImage(image, 0, 0, newWidth, newHeight);
   const newDataUrl = canvas.toDataURL(imageType, imageQuality);
-  if (this.debug) {
+  if (debug) {
     console.log("quill.imageCompressor: downscaling image...", {
       args: {
         dataUrl,
