@@ -102,14 +102,22 @@ class imageCompressor {
     const fileSizeKiloBytes = (fileSizeBytes / 1024).toFixed(0);
     if (this.debug) {
       console.log(
-        "quill.imageCompressor: estimated img size: " + fileSizeKiloBytes + " kb"
+        "quill.imageCompressor: estimated img size: " +
+          fileSizeKiloBytes +
+          " kb"
       );
     }
   }
 }
 
 // Take an image URL, downscale it to the given width, and return a new image URL.
-async function downscaleImage(dataUrl, newWidth, imageType, imageQuality, debug) {
+async function downscaleImage(
+  dataUrl,
+  newMaxWidth,
+  imageType,
+  imageQuality,
+  debug
+) {
   "use strict";
   // Provide default values
   imageType = imageType || "image/jpeg";
@@ -125,6 +133,7 @@ async function downscaleImage(dataUrl, newWidth, imageType, imageQuality, debug)
   });
   const oldWidth = image.width;
   const oldHeight = image.height;
+  const newWidth = newMaxWidth > oldWidth ? oldWidth : newMaxWidth;
   const newHeight = Math.floor((oldHeight / oldWidth) * newWidth);
 
   // Create a temporary canvas to draw the downscaled image on.
@@ -157,4 +166,5 @@ async function downscaleImage(dataUrl, newWidth, imageType, imageQuality, debug)
 }
 
 window.imageCompressor = imageCompressor;
+export { imageCompressor };
 export default imageCompressor;
