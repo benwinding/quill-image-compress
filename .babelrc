@@ -10,5 +10,5 @@
       }
     ]
   ],
-  "plugins": ["transform-remove-console"]
+  "plugins": ["transform-remove-console", "babel-plugin-transform-runtime"]
 }

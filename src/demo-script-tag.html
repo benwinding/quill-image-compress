@@ -35,6 +35,32 @@
 			src="https://cdn.polyfill.io/v2/polyfill.min.js?features=Promise"
 			crossorigin="anonymous"
 		></script>
-		<script src="/dist/demo.min.js"></script>
+		<script src="/dist/quill.imageCompressor.min.js"></script>
+    <script>
+			Quill.register("modules/imageCompressor", imageCompressor);
+
+			const fullToolbarOptions = [
+				[{ header: [1, 2, 3, false] }],
+				["bold", "italic"],
+				["clean"],
+				["image"]
+			];
+			
+			console.log('Demo loaded...')
+			
+			var quill = new Quill("#editor", {
+				theme: "snow",
+				modules: {
+					toolbar: {
+						container: fullToolbarOptions
+					},
+					imageCompressor: {
+						quality: 0.9,
+						maxWidth: 3000,
+						imageType: 'image/jpeg'
+					}
+				}
+			});
+    </script>
 	</body>
 </html>

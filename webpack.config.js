@@ -34,20 +34,14 @@ module.exports = [
             ]
           })
         },
-        // {
-        //   test: /\.js$/,
-        //   exclude: /node_modules/,
-        //   use: {
-        //     loader: "babel-loader"
-        //   }
-        // }
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          use: {
+            loader: "babel-loader"
+          }
+        }
       ]
-    },
-    plugins: [
-      new UglifyJSPlugin({
-        extractComments: true
-      }),
-      new ExtractTextPlugin("quill.imageCompressor.min.css")
-    ]
+    }
   }
 ];

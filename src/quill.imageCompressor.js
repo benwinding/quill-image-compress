@@ -156,4 +156,5 @@ async function downscaleImage(dataUrl, newWidth, imageType, imageQuality, debug)
   return newDataUrl;
 }
 
+window.imageCompressor = imageCompressor;
 export default imageCompressor;
