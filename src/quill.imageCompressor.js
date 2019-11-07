@@ -1,4 +1,8 @@
 function warnAboutOptions(options) {
+  // Safe-ify Options
+  options.maxWidth = options.maxWidth || 1000;
+  options.maxHeight = options.maxHeight || 1000;
+
   if (options.maxWidth && typeof options.maxWidth !== "number") {
     console.warn(
       `[config error] 'maxWidth' is required to be a "number" (in pixels), 
@@ -6,6 +10,14 @@ recieved: ${options.maxWidth}
 -> using default 1000`
     );
     options.maxWidth = 1000;
+  }
+  if (options.maxHeight && typeof options.maxHeight !== "number") {
+    console.warn(
+      `[config error] 'maxHeight' is required to be a "number" (in pixels), 
+recieved: ${options.maxHeight}
+-> using default 1000`
+    );
+    options.maxHeight = 1000;
   }
   if (options.quality && typeof options.quality !== "number") {
     console.warn(
@@ -32,8 +44,8 @@ recieved: ${options.imageType}
 class imageCompressor {
   constructor(quill, options) {
     this.quill = quill;
-    this.options = options;
     this.range = null;
+    this.options = options;
     this.debug = options.debug == null || options.debug == true;
 
     warnAboutOptions(options);
@@ -75,6 +87,7 @@ class imageCompressor {
         const base64ImageSrcNew = await downscaleImage(
           base64ImageSrc,
           this.options.maxWidth,
+          this.options.maxHeight,
           this.options.imageType,
           this.options.quality,
           this.debug
@@ -113,7 +126,8 @@ class imageCompressor {
 // Take an image URL, downscale it to the given width, and return a new image URL.
 async function downscaleImage(
   dataUrl,
-  newMaxWidth,
+  maxWidth,
+  maxHeight,
   imageType,
   imageQuality,
   debug
@@ -131,10 +145,12 @@ async function downscaleImage(
       resolve();
     };
   });
-  const oldWidth = image.width;
-  const oldHeight = image.height;
-  const newWidth = newMaxWidth > oldWidth ? oldWidth : newMaxWidth;
-  const newHeight = Math.floor((oldHeight / oldWidth) * newWidth);
+  const [newWidth, newHeight] = getDimensions(
+    image.width,
+    image.height,
+    maxWidth,
+    maxHeight
+  );
 
   // Create a temporary canvas to draw the downscaled image on.
   const canvas = document.createElement("canvas");
@@ -163,6 +179,22 @@ async function downscaleImage(
     });
   }
   return newDataUrl;
+}
+
+function getDimensions(inputWidth, inputHeight, maxWidth, maxHeight) {
+  if (inputWidth < maxWidth && inputHeight < maxHeight) {
+    return [inputWidth, inputHeight];
+  }
+  if (inputWidth > maxWidth) {
+    const newWidth = maxWidth;
+    const newHeight = Math.floor((inputHeight / inputWidth) * newWidth);
+    return [newWidth, newHeight];
+  }
+  if (inputHeight > maxHeight) {
+    const newHeight = maxHeight;
+    const newWidth = Math.floor((inputWidth / inputHeight) * newHeight);
+    return [newWidth, newHeight];
+  }
 }
 
 window.imageCompressor = imageCompressor;

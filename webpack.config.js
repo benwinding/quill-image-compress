@@ -19,6 +19,7 @@ module.exports = [
     externals: {
       quill: "Quill"
     },
+    // devtool: 'eval-source-map',
     module: {
       rules: [
         {

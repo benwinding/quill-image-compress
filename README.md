@@ -25,6 +25,7 @@ const quill = new Quill(editor, {
     imageCompress: {
       quality: 0.7, // default
       maxWidth: 1000, // default
+      maxHeight: 1000, // default
       imageType: 'image/jpeg', // default
       debug: true, // default
     }
@@ -44,7 +45,8 @@ const quill = new Quill(editor, {
 				modules: {
 					imageCompressor: {
 						quality: 0.9,
-						maxWidth: 3000,
+            maxWidth: 1000, // default
+            maxHeight: 1000, // default
 						imageType: 'image/jpeg'
 					}
 				}
