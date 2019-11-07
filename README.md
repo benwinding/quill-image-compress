@@ -8,6 +8,9 @@
 
 Quill.js Module which compresses images that are uploaded to the editor 
 
+- [Live Demo!](https://benwinding.github.io/quill-image-compress/src/demo.html)
+- [Live Demo! (with script tag)](https://benwinding.github.io/quill-image-compress/src/demo-script-tag.html)
+
 ## Install
 `yarn add quill-image-compress`
 
