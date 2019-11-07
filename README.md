@@ -37,20 +37,20 @@ const quill = new Quill(editor, {
 ## Quickstart (script tag)
 
 ``` html
-		<script src="/dist/quill.imageCompressor.min.js"></script>
+    <script src="/dist/quill.imageCompressor.min.js"></script>
     <script>
-			Quill.register("modules/imageCompressor", imageCompressor);
-			
-			var quill = new Quill("#editor", {
-				modules: {
-					imageCompressor: {
-						quality: 0.9,
+      Quill.register("modules/imageCompressor", imageCompressor);
+      
+      var quill = new Quill("#editor", {
+        modules: {
+          imageCompressor: {
+            quality: 0.9,
             maxWidth: 1000, // default
             maxHeight: 1000, // default
-						imageType: 'image/jpeg'
-					}
-				}
-			});
+            imageType: 'image/jpeg'
+          }
+        }
+      });
     </script>
 ```
 
