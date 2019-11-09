@@ -1,7 +1,7 @@
 {
 	"name": "quill-image-compress",
 	"description": "A Quill rich text editor Module which compresses images uploaded to the editor",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"main": "src/quill.imageCompressor.js",
 	"homepage": "https://benwinding.github.io/quill-image-compress/src/demo.html",
 	"repository": "https://github.com/benwinding/quill-image-compress",
