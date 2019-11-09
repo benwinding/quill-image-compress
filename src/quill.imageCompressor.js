@@ -188,7 +188,15 @@ function getDimensions(inputWidth, inputHeight, maxWidth, maxHeight) {
   if (inputWidth > maxWidth) {
     const newWidth = maxWidth;
     const newHeight = Math.floor((inputHeight / inputWidth) * newWidth);
-    return [newWidth, newHeight];
+
+    if (newHeight > maxHeight) {
+      const newHeight = maxHeight;
+      const newWidth = Math.floor((inputWidth / inputHeight) * newHeight);
+      return [newWidth, newHeight];
+    }
+    else {
+      return [newWidth, newHeight];
+    }
   }
   if (inputHeight > maxHeight) {
     const newHeight = maxHeight;
