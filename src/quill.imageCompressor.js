@@ -165,17 +165,14 @@ async function downscaleImage(
     console.log("quill.imageCompressor: downscaling image...", {
       args: {
         dataUrl,
-        newWidth,
+        maxWidth,
+        maxHeight,
         imageType,
-        imageQuality
+        imageQuality,
+        debug
       },
-      image,
-      oldWidth,
-      oldHeight,
       newHeight,
-      canvas,
-      ctx,
-      newDataUrl
+      newWidth,
     });
   }
   return newDataUrl;
