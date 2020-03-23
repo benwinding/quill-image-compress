@@ -1,6 +1,6 @@
 const path = require("path");
-const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+
+const isProd = process.argv.includes("production");
 
 module.exports = [
   {
@@ -11,30 +11,18 @@ module.exports = [
     output: {
       filename: "[name].min.js",
       path: path.resolve(__dirname, "dist"),
-      publicPath: "/dist/",
+      libraryTarget: "umd",
+      publicPath: "/dist/"
     },
     devServer: {
-      contentBase: './src',
+      contentBase: "./src"
     },
     externals: {
       quill: "Quill"
     },
-    // devtool: 'eval-source-map',
+    devtool: isProd ? undefined : "inline-source-map",
     module: {
       rules: [
-        {
-          test: /\.css$/,
-          use: ExtractTextPlugin.extract({
-            use: [
-              {
-                loader: "css-loader",
-                options: {
-                  minimize: true
-                }
-              }
-            ]
-          })
-        },
         {
           test: /\.js$/,
           exclude: /node_modules/,

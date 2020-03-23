@@ -26,15 +26,22 @@
         <strong>base64</strong> and compressed (if it exceeds the maximum
         limits)
       </p>
-    </div>
+		</div>
+    <h3>
+      HTML Output From Quill
+    </h3>
+		<div id="output-div"></div>
 
 		<script
 			src="https://cdn.polyfill.io/v2/polyfill.min.js?features=Promise"
 			crossorigin="anonymous"
 		></script>
+		<script src="https://cdn.jsdelivr.net/npm/quill-image-compress@1.2.3/dist/quill.imageCompressor.min.js"></script>
 		<script src="../dist/quill.imageCompressor.min.js"></script>
+		<!-- <script src="https://cdn.jsdelivr.net/npm/quill-html-edit-button@1.0.10/dist/quill.htmlEditButton.min.js"></script> -->
     <script>
 			Quill.register("modules/imageCompressor", imageCompressor);
+			// Quill.register("modules/htmlEditButton", htmlEditButton);
 
 			const fullToolbarOptions = [
 				[{ header: [1, 2, 3, false] }],
@@ -54,10 +61,20 @@
 					imageCompressor: {
 						quality: 0.9,
 						maxWidth: 3000,
-						imageType: 'image/jpeg'
-					}
+						imageType: 'image/jpeg',
+						debug: true
+					},
+					// htmlEditButton: {
+					// 	debug: true
+					// }
 				}
 			});
+
+			const outputEl = document.getElementById('output-div')
+			setInterval(() => {
+				const html = quill.container.firstChild.innerHTML;
+				outputEl.innerText = html
+			}, 2000);
     </script>
 	</body>
 </html>

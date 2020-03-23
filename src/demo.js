@@ -22,7 +22,8 @@ var quill = new Quill("#editor", {
       quality: 0.9,
       maxWidth: 1000,
       maxHeight: 1000,
-      imageType: 'image/jpeg'
-    }
+      imageType: 'image/jpeg',
+      debug: true
+    },
   }
 });

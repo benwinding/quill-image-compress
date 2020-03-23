@@ -41,14 +41,30 @@ recieved: ${options.imageType}
   }
 }
 
+let debug = true;
+const Logger = {
+  prefixString() {
+    return `</> quill-image-compress: `;
+  },
+  get log() {
+    if (!debug) {
+      return (...any) => {};
+    }
+    const boundLogFn = console.log.bind(console, this.prefixString());
+    return boundLogFn;
+  }
+};
+
 class imageCompressor {
   constructor(quill, options) {
     this.quill = quill;
     this.range = null;
     this.options = options;
-    this.debug = options.debug == null || options.debug == true;
+    debug = options && options.debug;
 
     warnAboutOptions(options);
+
+    Logger.log('fileChanged', {options, quill, debug});
 
     var toolbar = this.quill.getModule("toolbar");
     toolbar.addHandler("image", this.selectLocalImage.bind(this));
@@ -74,6 +90,7 @@ class imageCompressor {
 
   fileChanged() {
     const file = this.fileHolder.files[0];
+    Logger.log('fileChanged', {file});
     if (!file) {
       return;
     }
@@ -103,7 +120,7 @@ class imageCompressor {
     const range = this.range;
     // Insert the compressed image
     this.logFileSize(url);
-    this.quill.insertEmbed(range.index, "image", `${url}`);
+    this.quill.insertEmbed(range.index, "image", `${url}`, 'user');
     // Move cursor to next position
     range.index++;
     this.quill.setSelection(range, "api");
@@ -113,13 +130,7 @@ class imageCompressor {
     const head = "data:image/png;base64,";
     const fileSizeBytes = Math.round(((dataUrl.length - head.length) * 3) / 4);
     const fileSizeKiloBytes = (fileSizeBytes / 1024).toFixed(0);
-    if (this.debug) {
-      console.log(
-        "quill.imageCompressor: estimated img size: " +
-          fileSizeKiloBytes +
-          " kb"
-      );
-    }
+    Logger.log("estimated img size" + fileSizeKiloBytes + " kb");
   }
 }
 
@@ -129,8 +140,7 @@ async function downscaleImage(
   maxWidth,
   maxHeight,
   imageType,
-  imageQuality,
-  debug
+  imageQuality
 ) {
   "use strict";
   // Provide default values
@@ -161,23 +171,18 @@ async function downscaleImage(
   const ctx = canvas.getContext("2d");
   ctx.drawImage(image, 0, 0, newWidth, newHeight);
   const newDataUrl = canvas.toDataURL(imageType, imageQuality);
-  if (debug) {
-    console.log("quill.imageCompressor: downscaling image...", {
-      args: {
-        dataUrl,
-        newWidth,
-        imageType,
-        imageQuality
-      },
-      image,
-      oldWidth,
-      oldHeight,
-      newHeight,
-      canvas,
-      ctx,
-      newDataUrl
-    });
-  }
+  Logger.log("downscaling image...", {
+    args: {
+      dataUrl,
+      maxWidth,
+      maxHeight,
+      imageType,
+      imageQuality,
+      debug
+    },
+    newHeight,
+    newWidth
+  });
   return newDataUrl;
 }
 
@@ -193,8 +198,7 @@ function getDimensions(inputWidth, inputHeight, maxWidth, maxHeight) {
       const newHeight = maxHeight;
       const newWidth = Math.floor((inputWidth / inputHeight) * newHeight);
       return [newWidth, newHeight];
-    }
-    else {
+    } else {
       return [newWidth, newHeight];
     }
   }
