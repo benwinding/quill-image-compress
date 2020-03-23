@@ -120,7 +120,7 @@ class imageCompressor {
     const range = this.range;
     // Insert the compressed image
     this.logFileSize(url);
-    this.quill.insertEmbed(range.index, "image", `${url}`);
+    this.quill.insertEmbed(range.index, "image", `${url}`, 'user');
     // Move cursor to next position
     range.index++;
     this.quill.setSelection(range, "api");
