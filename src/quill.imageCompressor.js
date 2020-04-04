@@ -187,7 +187,7 @@ async function downscaleImage(
 }
 
 function getDimensions(inputWidth, inputHeight, maxWidth, maxHeight) {
-  if (inputWidth < maxWidth && inputHeight < maxHeight) {
+  if (inputWidth <= maxWidth && inputHeight <= maxHeight) {
     return [inputWidth, inputHeight];
   }
   if (inputWidth > maxWidth) {
