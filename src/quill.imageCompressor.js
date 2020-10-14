@@ -52,8 +52,11 @@ const Logger = {
     }
     const boundLogFn = console.log.bind(console, this.prefixString());
     return boundLogFn;
-  }
+  },
 };
+
+const { ImageDrop } = require("./quill.imageDrop");
+const { file2b64 } = require("./file2b64");
 
 class imageCompressor {
   constructor(quill, options) {
@@ -62,12 +65,18 @@ class imageCompressor {
     this.options = options;
     debug = options && options.debug;
 
+    const onImageDrop = async (dataUrl) => {
+      Logger.log("onImageDrop", { dataUrl });
+      const dataUrlCompressed = await this.downscaleImageFromUrl(dataUrl);
+      this.insertToEditor(dataUrlCompressed);
+    };
+    this.imageDrop = new ImageDrop(quill, onImageDrop, Logger);
     warnAboutOptions(options);
 
-    Logger.log('fileChanged', {options, quill, debug});
+    Logger.log("fileChanged", { options, quill, debug });
 
     var toolbar = this.quill.getModule("toolbar");
-    toolbar.addHandler("image", this.selectLocalImage.bind(this));
+    toolbar.addHandler("image", () => this.selectLocalImage());
   }
 
   selectLocalImage() {
@@ -77,7 +86,7 @@ class imageCompressor {
     this.fileHolder.setAttribute("accept", "image/*");
     this.fileHolder.setAttribute("style", "visibility:hidden");
 
-    this.fileHolder.onchange = this.fileChanged.bind(this);
+    this.fileHolder.onchange = () => this.fileChanged();
 
     document.body.appendChild(this.fileHolder);
 
@@ -88,39 +97,39 @@ class imageCompressor {
     });
   }
 
-  fileChanged() {
+  async fileChanged() {
     const file = this.fileHolder.files[0];
-    Logger.log('fileChanged', {file});
+    Logger.log("fileChanged", { file });
     if (!file) {
       return;
     }
-
-    const fileReader = new FileReader();
-
-    fileReader.addEventListener(
-      "load",
-      async () => {
-        const base64ImageSrc = fileReader.result;
-        const base64ImageSrcNew = await downscaleImage(
-          base64ImageSrc,
-          this.options.maxWidth,
-          this.options.maxHeight,
-          this.options.imageType,
-          this.options.quality,
-          this.debug
-        );
-        this.insertToEditor(base64ImageSrcNew);
-      },
-      false
+    const base64ImageSrc = await file2b64(file);
+    const base64ImageSmallSrc = await this.downscaleImageFromUrl(
+      base64ImageSrc
     );
-    fileReader.readAsDataURL(file);
+    this.insertToEditor(base64ImageSmallSrc);
+  }
+
+  async downscaleImageFromUrl(dataUrl) {
+    const dataUrlCompressed = await downscaleImage(
+      dataUrl,
+      this.options.maxWidth,
+      this.options.maxHeight,
+      this.options.imageType,
+      this.options.quality,
+      this.debug
+    );
+    Logger.log("downscaleImageFromUrl", { dataUrl, dataUrlCompressed });
+    return dataUrlCompressed;
   }
 
   insertToEditor(url) {
+    Logger.log('insertToEditor', {url});
+    this.range = this.quill.getSelection();
     const range = this.range;
     // Insert the compressed image
     this.logFileSize(url);
-    this.quill.insertEmbed(range.index, "image", `${url}`, 'user');
+    this.quill.insertEmbed(range.index, "image", `${url}`, "user");
     // Move cursor to next position
     range.index++;
     this.quill.setSelection(range, "api");
@@ -130,7 +139,7 @@ class imageCompressor {
     const head = "data:image/png;base64,";
     const fileSizeBytes = Math.round(((dataUrl.length - head.length) * 3) / 4);
     const fileSizeKiloBytes = (fileSizeBytes / 1024).toFixed(0);
-    Logger.log("estimated img size" + fileSizeKiloBytes + " kb");
+    Logger.log("estimated img size: " + fileSizeKiloBytes + " kb");
   }
 }
 
@@ -150,7 +159,7 @@ async function downscaleImage(
   // Create a temporary image so that we can compute the height of the downscaled image.
   const image = new Image();
   image.src = dataUrl;
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     image.onload = () => {
       resolve();
     };
@@ -178,10 +187,10 @@ async function downscaleImage(
       maxHeight,
       imageType,
       imageQuality,
-      debug
+      debug,
     },
     newHeight,
-    newWidth
+    newWidth,
   });
   return newDataUrl;
 }
