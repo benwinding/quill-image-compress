@@ -13,6 +13,12 @@
 		"build-dev": "webpack --mode development",
 		"build": "webpack --mode production"
 	},
+	"files": [
+    "src/*.html",
+    "src/*.js",
+		"dist",
+    "README.md"
+	],
 	"keywords": [
 		"quill",
 		"quilljs",
