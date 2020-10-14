@@ -1,3 +1,5 @@
+const { file2b64 } = require("./file2b64");
+
 /* 
 From: https://github.com/kensnyder/quill-image-drop-module/blob/master/index.js
 */
@@ -14,6 +16,20 @@ export class ImageDrop {
       (e) => this.handlePaste(e),
       false
     );
+  }
+
+  async handleNewImageFiles(imageFiles) {
+    if (!Array.isArray(imageFiles)) {
+      return;
+    }
+    const firstImage = imageFiles.pop();
+    if (!firstImage) {
+      return;
+    }
+    const blob = firstImage.getAsFile ? firstImage.getAsFile() : firstImage;
+    const base64ImageSrc = await file2b64(blob);
+    this.logger.log("handlePaste", { base64ImageSrc });
+    this.onNewDataUrl(base64ImageSrc);
   }
 
   handleDrop(evt) {
@@ -38,7 +54,8 @@ export class ImageDrop {
         );
       }
     }
-    this.readFiles(evt.dataTransfer.files, (e) => this.onNewDataUrl(e));
+    const images = this.getImageFiles(evt.dataTransfer.files);
+    this.handleNewImageFiles(images);
   }
 
   handlePaste(evt) {
@@ -50,41 +67,21 @@ export class ImageDrop {
     if (!hasItems) {
       return;
     }
-    this.readFiles(evt.clipboardData.items, (dataUrl) => {
-      const hasSelection = !!this.quill.getSelection();
-			this.logger.log("handlePaste.callBack", { hasSelection, dataUrl });
-      if (hasSelection) {
-        // we must be in a browser that supports pasting (like Firefox)
-        // so it has already been placed into the editor
-      } else {
-        // otherwise we wait until after the paste when this.quill.getSelection()
-        // will return a valid index
-        setTimeout(() => this.onNewDataUrl(dataUrl), 0);
-      }
-    });
+    const images = this.getImageFiles(evt.clipboardData.items);
+    this.handleNewImageFiles(images);
   }
 
-  readFiles(files, callback) {
+  getImageFiles(filesList) {
+    const files = Array.from(filesList);
     this.logger.log("readFiles", { files });
     // check each file for an image
-    Array.from(files).map((file) => {
+    function isFileImage(file) {
       const isImage = !!file.type.match(
         /^image\/(gif|jpe?g|a?png|svg|webp|bmp|vnd\.microsoft\.icon)/i
       );
-      if (!isImage) {
-        return;
-      }
-      this.logger.log("readFiles", { isImage, file });
-      // set up file reader
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        callback(evt.target.result);
-      };
-      // read the clipboard item or file
-      const blob = file.getAsFile ? file.getAsFile() : file;
-      if (blob instanceof Blob) {
-        reader.readAsDataURL(blob);
-      }
-    });
+      return isImage;
+    }
+    const images = files.filter(isFileImage);
+    return images || [];
   }
 }
