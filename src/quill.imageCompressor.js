@@ -55,6 +55,8 @@ const Logger = {
   }
 };
 
+const { ImageDrop } = require('./quill.imageDrop');
+
 class imageCompressor {
   constructor(quill, options) {
     this.quill = quill;
@@ -62,12 +64,18 @@ class imageCompressor {
     this.options = options;
     debug = options && options.debug;
 
+    const onImageDrop = async (dataUrl) => {
+      Logger.log('onImageDrop', {dataUrl});
+      const base64ImageSmallSrc = await this.downscaleImageFromUrl(dataUrl);
+      this.insertToEditor(base64ImageSmallSrc);
+    };
+    this.imageDrop = new ImageDrop(quill, onImageDrop, Logger);  
     warnAboutOptions(options);
 
     Logger.log('fileChanged', {options, quill, debug});
 
     var toolbar = this.quill.getModule("toolbar");
-    toolbar.addHandler("image", this.selectLocalImage.bind(this));
+    toolbar.addHandler("image", () => this.selectLocalImage());
   }
 
   selectLocalImage() {
@@ -77,7 +85,7 @@ class imageCompressor {
     this.fileHolder.setAttribute("accept", "image/*");
     this.fileHolder.setAttribute("style", "visibility:hidden");
 
-    this.fileHolder.onchange = this.fileChanged.bind(this);
+    this.fileHolder.onchange = () => this.fileChanged();
 
     document.body.appendChild(this.fileHolder);
 
@@ -101,22 +109,28 @@ class imageCompressor {
       "load",
       async () => {
         const base64ImageSrc = fileReader.result;
-        const base64ImageSrcNew = await downscaleImage(
-          base64ImageSrc,
-          this.options.maxWidth,
-          this.options.maxHeight,
-          this.options.imageType,
-          this.options.quality,
-          this.debug
-        );
-        this.insertToEditor(base64ImageSrcNew);
+        const base64ImageSmallSrc = await this.downscaleImageFromUrl(base64ImageSrc);
+        this.insertToEditor(base64ImageSmallSrc);
       },
       false
     );
     fileReader.readAsDataURL(file);
   }
 
+  async downscaleImageFromUrl(dataUrl) {
+    const base64ImageSrcNew = await downscaleImage(
+      dataUrl,
+      this.options.maxWidth,
+      this.options.maxHeight,
+      this.options.imageType,
+      this.options.quality,
+      this.debug
+    );
+    return base64ImageSrcNew;
+  }
+
   insertToEditor(url) {
+    this.range = this.quill.getSelection();
     const range = this.range;
     // Insert the compressed image
     this.logFileSize(url);
