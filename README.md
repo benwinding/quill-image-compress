@@ -15,6 +15,16 @@ Quill.js Module which compresses images that are uploaded to the editor
 ## Install
 `yarn add quill-image-compress`
 
+## Features
+
+- Will compress image when:
+  - Drag/Dropped into quill
+  - Pasted into quill
+  - Clicked image load button
+- Handles most image formats a browser can read: 
+  - `gif|jpeg|png|svg|webp|bmp|vnd`
+- Compression options [more info](#options)
+
 ## Quickstart
 
 ``` js
