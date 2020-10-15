@@ -4,7 +4,7 @@ function warnAboutOptions(options) {
   options.maxHeight = options.maxHeight || 1000;
 
   if (options.maxWidth && typeof options.maxWidth !== "number") {
-    console.warn(
+    Logger.warn(
       `[config error] 'maxWidth' is required to be a "number" (in pixels), 
 recieved: ${options.maxWidth}
 -> using default 1000`
@@ -12,7 +12,7 @@ recieved: ${options.maxWidth}
     options.maxWidth = 1000;
   }
   if (options.maxHeight && typeof options.maxHeight !== "number") {
-    console.warn(
+    Logger.warn(
       `[config error] 'maxHeight' is required to be a "number" (in pixels), 
 recieved: ${options.maxHeight}
 -> using default 1000`
@@ -20,7 +20,7 @@ recieved: ${options.maxHeight}
     options.maxHeight = 1000;
   }
   if (options.quality && typeof options.quality !== "number") {
-    console.warn(
+    Logger.warn(
       `quill.imageCompressor: [config error] 'quality' is required to be a "number", 
 recieved: ${options.quality}
 -> using default 0.7`
@@ -32,7 +32,7 @@ recieved: ${options.quality}
     (typeof options.imageType !== "string" ||
       !options.imageType.startsWith("image/"))
   ) {
-    console.warn(
+    Logger.warn(
       `quill.imageCompressor: [config error] 'imageType' is required be in the form of "image/png" or "image/jpeg" etc ..., 
 recieved: ${options.imageType}
 -> using default image/jpeg`
@@ -51,6 +51,14 @@ const Logger = {
       return (...any) => {};
     }
     const boundLogFn = console.log.bind(console, this.prefixString());
+    return boundLogFn;
+  },
+  get error() {
+    const boundLogFn = console.error.bind(console, this.prefixString());
+    return boundLogFn;
+  },
+  get warn() {
+    const boundLogFn = console.warn.bind(console, this.prefixString());
     return boundLogFn;
   },
 };
@@ -76,7 +84,11 @@ class imageCompressor {
     Logger.log("fileChanged", { options, quill, debug });
 
     var toolbar = this.quill.getModule("toolbar");
-    toolbar.addHandler("image", () => this.selectLocalImage());
+    if (toolbar) {
+      toolbar.addHandler("image", () => this.selectLocalImage());
+    } else {
+      Logger.error('Quill toolbar module not found! need { toolbar: // options } in Quill.modules for image icon to sit in')
+    }
   }
 
   selectLocalImage() {
