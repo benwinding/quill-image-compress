@@ -59,7 +59,6 @@ export class ImageDrop {
   }
 
   handlePaste(evt) {
-		evt.preventDefault();
     const hasItems =
       evt.clipboardData &&
       evt.clipboardData.items &&
@@ -68,8 +67,13 @@ export class ImageDrop {
     if (!hasItems) {
       return;
     }
-		const images = this.getImageFiles(evt.clipboardData.items);
-		this.handleNewImageFiles(images);
+    const images = this.getImageFiles(evt.clipboardData.items);
+
+    if (images.length === 0) {
+      return;
+    }
+    evt.preventDefault();
+    this.handleNewImageFiles(images);
   }
 
   getImageFiles(filesList) {
