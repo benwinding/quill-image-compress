@@ -51,7 +51,7 @@ const quill = new Quill(editor, {
 ## Quickstart (script tag)
 
 ``` html
-    <script src="/dist/quill.imageCompressor.min.js"></script>
+    <script src="https://unpkg.com/quill-image-compress@1.2.11/dist/quill.imageCompressor.min.js"></script>
     <script>
       Quill.register("modules/imageCompressor", imageCompressor);
       
