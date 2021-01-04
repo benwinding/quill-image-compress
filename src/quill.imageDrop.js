@@ -87,14 +87,13 @@ export class ImageDrop {
 
   getImageFiles(filesList) {
     const files = Array.from(filesList);
-    this.logger.log("readFiles from linked", { files });
+    this.logger.log("readFiles", { files });
     // check each file for an image
     function isFileImage(file) {
       const isImage = !!file.type.match(
         /^image\/(gif|jpe?g|a?png|svg|webp|bmp|vnd\.microsoft\.icon)/i
         );
-        console.log("isImageFile", file.type, isImage);
-        return isImage;
+      return isImage;
     }
     const images = files.filter(isFileImage);
     return images || [];
