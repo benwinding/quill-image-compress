@@ -72,19 +72,29 @@ export class ImageDrop {
     if (images.length === 0) {
       return;
     }
+
+
+    // Text pasted from word will contain both text/html and image/png. 
+    // 
+    if (Array.from(evt.clipboardData.items).some(f => f.type === 'text/html')) {
+      this.logger.log("detected html, not handling");
+      return;
+    }
+
     evt.preventDefault();
     this.handleNewImageFiles(images);
   }
 
   getImageFiles(filesList) {
     const files = Array.from(filesList);
-    this.logger.log("readFiles", { files });
+    this.logger.log("readFiles from linked", { files });
     // check each file for an image
     function isFileImage(file) {
       const isImage = !!file.type.match(
         /^image\/(gif|jpe?g|a?png|svg|webp|bmp|vnd\.microsoft\.icon)/i
-      );
-      return isImage;
+        );
+        console.log("isImageFile", file.type, isImage);
+        return isImage;
     }
     const images = files.filter(isFileImage);
     return images || [];
