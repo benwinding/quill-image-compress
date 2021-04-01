@@ -59,7 +59,6 @@ export class ImageDrop {
   }
 
   handlePaste(evt) {
-		evt.preventDefault();
     const hasItems =
       evt.clipboardData &&
       evt.clipboardData.items &&
@@ -68,8 +67,22 @@ export class ImageDrop {
     if (!hasItems) {
       return;
     }
-		const images = this.getImageFiles(evt.clipboardData.items);
-		this.handleNewImageFiles(images);
+    const images = this.getImageFiles(evt.clipboardData.items);
+
+    if (images.length === 0) {
+      return;
+    }
+
+
+    // Text pasted from word will contain both text/html and image/png. 
+    // 
+    if (Array.from(evt.clipboardData.items).some(f => f.type === 'text/html')) {
+      this.logger.log("detected html, not handling");
+      return;
+    }
+
+    evt.preventDefault();
+    this.handleNewImageFiles(images);
   }
 
   getImageFiles(filesList) {
@@ -79,7 +92,7 @@ export class ImageDrop {
     function isFileImage(file) {
       const isImage = !!file.type.match(
         /^image\/(gif|jpe?g|a?png|svg|webp|bmp|vnd\.microsoft\.icon)/i
-      );
+        );
       return isImage;
     }
     const images = files.filter(isFileImage);
