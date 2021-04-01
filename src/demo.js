@@ -22,7 +22,7 @@ var quill = new Quill("#editor", {
       quality: 0.9,
       maxWidth: 200,
       maxHeight: 200,
-      imageType: 'image/jpeg',
+      imageType: 'image/png',
       debug: true
     },
   }
