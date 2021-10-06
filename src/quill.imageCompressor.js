@@ -42,6 +42,7 @@ recieved: ${options.imageType}
 }
 
 let debug = true;
+let suppressErrorLogging = false;
 const Logger = {
   prefixString() {
     return `</> quill-image-compress: `;
@@ -54,10 +55,16 @@ const Logger = {
     return boundLogFn;
   },
   get error() {
+    if (suppressErrorLogging) {
+      return (...any) => {};
+    }
     const boundLogFn = console.error.bind(console, this.prefixString());
     return boundLogFn;
   },
   get warn() {
+    if (suppressErrorLogging) {
+      return (...any) => {};
+    }
     const boundLogFn = console.warn.bind(console, this.prefixString());
     return boundLogFn;
   },
@@ -73,6 +80,7 @@ class imageCompressor {
     this.range = null;
     this.options = options;
     debug = options && options.debug;
+    suppressErrorLogging = options && options.suppressErrorLogging;
 
     const onImageDrop = async (dataUrl) => {
       Logger.log("onImageDrop", { dataUrl });
