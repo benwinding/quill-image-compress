@@ -42,6 +42,7 @@ const quill = new Quill(editor, {
       maxHeight: 1000, // default
       imageType: 'image/jpeg', // default
       debug: true, // default
+      suppressErrorLogging: false, // default
     }
   }
 });
