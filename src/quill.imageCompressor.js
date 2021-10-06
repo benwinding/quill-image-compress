@@ -50,14 +50,23 @@ const Logger = {
     if (!debug) {
       return (...any) => {};
     }
+
     const boundLogFn = console.log.bind(console, this.prefixString());
     return boundLogFn;
   },
   get error() {
+    if (!debug) {
+      return (...any) => {};
+    }
+
     const boundLogFn = console.error.bind(console, this.prefixString());
     return boundLogFn;
   },
   get warn() {
+    if (!debug) {
+      return (...any) => {};
+    }
+
     const boundLogFn = console.warn.bind(console, this.prefixString());
     return boundLogFn;
   },
