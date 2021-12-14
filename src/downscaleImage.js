@@ -34,6 +34,10 @@ export async function downscaleImage(
 
   // Draw the downscaled image on the canvas and return the new data URL.
   const ctx = canvas.getContext("2d");
+  if (imageType === "image/jpeg") {
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, image.width, image.height);
+  }
   ctx.drawImage(image, 0, 0, newWidth, newHeight);
   const newDataUrl = canvas.toDataURL(imageType, imageQuality);
   logger.log("downscaling image...", {
