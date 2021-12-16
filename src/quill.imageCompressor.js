@@ -6,7 +6,7 @@ function warnAboutOptions(options) {
   if (options.maxWidth && typeof options.maxWidth !== "number") {
     Logger.warn(
       `[config error] 'maxWidth' is required to be a "number" (in pixels), 
-recieved: ${options.maxWidth}
+received: ${options.maxWidth}
 -> using default 1000`
     );
     options.maxWidth = 1000;
@@ -14,7 +14,7 @@ recieved: ${options.maxWidth}
   if (options.maxHeight && typeof options.maxHeight !== "number") {
     Logger.warn(
       `[config error] 'maxHeight' is required to be a "number" (in pixels), 
-recieved: ${options.maxHeight}
+received: ${options.maxHeight}
 -> using default 1000`
     );
     options.maxHeight = 1000;
@@ -22,7 +22,7 @@ recieved: ${options.maxHeight}
   if (options.quality && typeof options.quality !== "number") {
     Logger.warn(
       `quill.imageCompressor: [config error] 'quality' is required to be a "number", 
-recieved: ${options.quality}
+received: ${options.quality}
 -> using default 0.7`
     );
     options.quality = 0.7;
@@ -34,10 +34,28 @@ recieved: ${options.quality}
   ) {
     Logger.warn(
       `quill.imageCompressor: [config error] 'imageType' is required be in the form of "image/png" or "image/jpeg" etc ..., 
-recieved: ${options.imageType}
+received: ${options.imageType}
 -> using default image/jpeg`
     );
     options.imageType = "image/jpeg";
+  }
+  if (
+    options.keepImageTypes &&
+    (!Array.isArray(options.keepImageTypes))
+  ) {
+    Logger.warn(
+      `quill.imageCompressor: [config error] 'keepImageTypes' is required to be a "array", received: ${options.keepImageTypes} -> using default []`
+    )
+    options.keepImageTypes = [];
+  }
+  if (
+    options.ignoreImageTypes &&
+    (!Array.isArray(options.ignoreImageTypes))
+  ) {
+    Logger.warn(
+      `quill.imageCompressor: [config error] 'ignoreImageTypes' is required to be a "array", received: ${options.ignoreImageTypes} -> using default []`
+    )
+    options.ignoreImageTypes = [];
   }
 }
 
@@ -132,14 +150,15 @@ class imageCompressor {
   }
 
   async downscaleImageFromUrl(dataUrl) {
-    const logger = Logger;
     const dataUrlCompressed = await downscaleImage(
       dataUrl,
       this.options.maxWidth,
       this.options.maxHeight,
       this.options.imageType,
+      this.options.keepImageTypes,
+      this.options.ignoreImageTypes,
       this.options.quality,
-      logger,
+      Logger,
     );
     Logger.log("downscaleImageFromUrl", { dataUrl, dataUrlCompressed });
     return dataUrlCompressed;
