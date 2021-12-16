@@ -37,8 +37,13 @@ export async function downscaleImage(
   canvas.width = newWidth;
   canvas.height = newHeight;
 
-  // Draw the downscaled image on the canvas and return the new data URL.
   const ctx = canvas.getContext("2d");
+  
+  // If the type is an jpeg, draw a white background first.
+  if (imageType === "image/jpeg") {
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, image.width, image.height);
+  }
 
   // If the type is included in the ignore list, return the original
   if (ignoreImageTypes.includes(inputImageType)) {
@@ -50,6 +55,7 @@ export async function downscaleImage(
     imageType = inputImageType;
   }
 
+  // Draw the downscaled image on the canvas and return the new data URL.
   ctx.drawImage(image, 0, 0, newWidth, newHeight);
   const newDataUrl = canvas.toDataURL(imageType, imageQuality);
   logger.log("downscaling image...", {
