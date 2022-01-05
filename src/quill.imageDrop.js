@@ -77,8 +77,7 @@ export class ImageDrop {
     // Text pasted from word will contain both text/html and image/png.
     const hasHtmlMixed = Array.from(evt.clipboardData.items).some(f => f.type === 'text/html');
     if (hasHtmlMixed) {
-      this.logger.log("detected html, not handling");
-      return;
+      this.logger.log("handlePaste also detected html");
     }
 
     evt.preventDefault();
@@ -87,11 +86,11 @@ export class ImageDrop {
 
   getImageFiles(filesList) {
     const files = Array.from(filesList);
-    this.logger.log("getImageFiles", { types: files.map(f => f.type) });
+    this.logger.log("getImageFiles", { mimeTypes: files.map(f => f.type) });
     // check each file for an image
     function isFileImage(file) {
       const isImage = !!file.type.match(
-        /^image\/(gif|jpe?g|a?png|svg|webp|bmp|vnd\.microsoft\.icon)/i
+        /^image\/(gif|jpe?g|a?png|svg|webp|bmp)/i
         );
       return isImage;
     }
