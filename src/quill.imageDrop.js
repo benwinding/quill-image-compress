@@ -28,7 +28,7 @@ export class ImageDrop {
     }
     const blob = firstImage.getAsFile ? firstImage.getAsFile() : firstImage;
     const base64ImageSrc = await file2b64(blob);
-    this.logger.log("handlePaste", { base64ImageSrc });
+    this.logger.log("handleNewImageFiles", { base64ImageSrc });
     this.onNewDataUrl(base64ImageSrc);
   }
 
@@ -68,15 +68,15 @@ export class ImageDrop {
       return;
     }
     const images = this.getImageFiles(evt.clipboardData.items);
-
-    if (images.length === 0) {
+    const hasImages = images.length > 0;
+    this.logger.log("handlePaste", { hasImages, imageCount: images.length });
+    if (!hasImages) {
       return;
     }
 
-
-    // Text pasted from word will contain both text/html and image/png. 
-    // 
-    if (Array.from(evt.clipboardData.items).some(f => f.type === 'text/html')) {
+    // Text pasted from word will contain both text/html and image/png.
+    const hasHtmlMixed = Array.from(evt.clipboardData.items).some(f => f.type === 'text/html');
+    if (hasHtmlMixed) {
       this.logger.log("detected html, not handling");
       return;
     }
@@ -87,7 +87,7 @@ export class ImageDrop {
 
   getImageFiles(filesList) {
     const files = Array.from(filesList);
-    this.logger.log("readFiles", { files });
+    this.logger.log("getImageFiles", { types: files.map(f => f.type) });
     // check each file for an image
     function isFileImage(file) {
       const isImage = !!file.type.match(
