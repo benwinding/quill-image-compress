@@ -25,6 +25,8 @@ Quill.js Module which compresses images that are uploaded to the editor
   - `gif|jpeg|png|svg|webp|bmp|vnd`
 - Compression options [more info](#options)
 
+_NOTE: :exclamation:you don't need `quill-image-drop-module`, it's included in this package:exclamation:_
+
 ## Quickstart
 
 ``` js
