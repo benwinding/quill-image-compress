@@ -1,5 +1,5 @@
 import Quill from "quill";
-import imageCompressor from "./quill.imageCompressor.js";
+import imageCompressor from "./quill.imageCompressor.ts";
 
 Quill.register("modules/imageCompressor", imageCompressor);
 
