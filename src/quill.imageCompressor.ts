@@ -6,21 +6,21 @@ const Logger = {
   },
   get log() {
     if (!debug) {
-      return (...any) => {};
+      return () => {};
     }
     const boundLogFn = console.log.bind(console, this.prefixString());
     return boundLogFn;
   },
   get error() {
     if (suppressErrorLogging) {
-      return (...any) => {};
+      return () => {};
     }
     const boundLogFn = console.error.bind(console, this.prefixString());
     return boundLogFn;
   },
   get warn() {
     if (suppressErrorLogging) {
-      return (...any) => {};
+      return () => {};
     }
     const boundLogFn = console.warn.bind(console, this.prefixString());
     return boundLogFn;
@@ -31,17 +31,36 @@ const { ImageDrop } = require("./quill.imageDrop");
 const { warnAboutOptions } = require("./options.validation");
 const { file2b64 } = require("./file2b64");
 const { downscaleImage } = require("./downscaleImage");
+import Quill from "quill";
+
+export type OptionsObject = {
+  validation?: boolean,
+  debug?: boolean,
+  suppressErrorLogging?: boolean,
+  maxWidth?: boolean,
+  maxHeight?: boolean,
+  imageType?: boolean,
+  keepImageTypes?: boolean,
+  ignoreImageTypes?: boolean,
+  quality?: boolean,
+}
 
 class imageCompressor {
-  constructor(quill, options) {
+  private quill: Quill;
+  private range: any;
+  private options: OptionsObject;
+  private imageDrop: any;
+  private fileHolder: HTMLInputElement | undefined;
+
+  constructor(quill: Quill, options: OptionsObject) {
     this.quill = quill;
     this.range = null;
     this.options = options || {};
-    debug = options.debug;
-    suppressErrorLogging = options.suppressErrorLogging;
+    debug = !!options.debug;
+    suppressErrorLogging = !!options.suppressErrorLogging;
 
     warnAboutOptions(options);
-    const onImageDrop = async (dataUrl) => {
+    const onImageDrop = async (dataUrl: string) => {
       Logger.log("onImageDrop", { dataUrl });
       const dataUrlCompressed = await this.downscaleImageFromUrl(dataUrl);
       this.insertToEditor(dataUrlCompressed);
@@ -72,12 +91,16 @@ class imageCompressor {
     this.fileHolder.click();
 
     window.requestAnimationFrame(() => {
-      document.body.removeChild(this.fileHolder);
+      this.fileHolder && document.body.removeChild(this.fileHolder);
     });
   }
 
   async fileChanged() {
-    const file = this.fileHolder.files[0];
+    const files = this.fileHolder?.files;
+    if (!files || !files.length) {
+      return;
+    }
+    const file = files[0];
     Logger.log("fileChanged", { file });
     if (!file) {
       return;
@@ -89,7 +112,7 @@ class imageCompressor {
     this.insertToEditor(base64ImageSmallSrc);
   }
 
-  async downscaleImageFromUrl(dataUrl) {
+  async downscaleImageFromUrl(dataUrl: string) {
     const dataUrlCompressed = await downscaleImage(
       dataUrl,
       this.options.maxWidth,
@@ -104,7 +127,7 @@ class imageCompressor {
     return dataUrlCompressed;
   }
 
-  insertToEditor(url) {
+  insertToEditor(url: string) {
     Logger.log('insertToEditor', {url});
     this.range = this.quill.getSelection();
     const range = this.range;
@@ -116,7 +139,7 @@ class imageCompressor {
     this.quill.setSelection(range, "api");
   }
 
-  logFileSize(dataUrl) {
+  logFileSize(dataUrl: string) {
     const head = "data:image/png;base64,";
     const fileSizeBytes = Math.round(((dataUrl.length - head.length) * 3) / 4);
     const fileSizeKiloBytes = (fileSizeBytes / 1024).toFixed(0);
@@ -124,6 +147,6 @@ class imageCompressor {
   }
 }
 
-window.imageCompressor = imageCompressor;
+(window as any)['imageCompressor'] = imageCompressor;
 export { imageCompressor };
 export default imageCompressor;
