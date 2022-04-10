@@ -5,11 +5,14 @@ const isProd = process.argv.includes("production");
 module.exports = [
   {
     entry: {
-      "quill.imageCompressor": "./src/quill.imageCompressor.js",
+      "index": "./src/index.ts",
+      "quill.imageCompressor": "./src/quill.imageCompressor.ts",
       demo: "./src/demo.js"
     },
     output: {
-      filename: "[name].min.js",
+      filename: (pathData) => {
+        return pathData.chunk.name === 'index' ? '[name].js' : '[name].min.js';
+      },
       path: path.resolve(__dirname, "dist"),
       libraryTarget: "umd",
       publicPath: "/dist/"
@@ -21,8 +24,12 @@ module.exports = [
       quill: "Quill"
     },
     devtool: isProd ? undefined : "inline-source-map",
+    resolve: {
+      extensions: [".ts", ".js"],
+    },
     module: {
       rules: [
+        { test: /\.ts$/, use: ["ts-loader"], exclude: /node_modules/ },
         {
           test: /\.js$/,
           exclude: /node_modules/,
