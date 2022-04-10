@@ -31,8 +31,9 @@ const { ImageDrop } = require("./quill.imageDrop");
 const { warnAboutOptions } = require("./options.validation");
 const { file2b64 } = require("./file2b64");
 const { downscaleImage } = require("./downscaleImage");
+import Quill from "quill";
 
-type OptionsObject = {
+export type OptionsObject = {
   validation?: boolean,
   debug?: boolean,
   suppressErrorLogging?: boolean,
@@ -45,13 +46,13 @@ type OptionsObject = {
 }
 
 class imageCompressor {
-  quill: any;
-  range: any;
-  options: OptionsObject;
-  imageDrop: any;
-  fileHolder: HTMLInputElement | undefined;
+  private quill: Quill;
+  private range: any;
+  private options: OptionsObject;
+  private imageDrop: any;
+  private fileHolder: HTMLInputElement | undefined;
 
-  constructor(quill: any, options: OptionsObject) {
+  constructor(quill: Quill, options: OptionsObject) {
     this.quill = quill;
     this.range = null;
     this.options = options || {};
