@@ -1,4 +1,4 @@
-export async function file2b64(file: any) {
+export async function file2b64(file: File) {
   const fileReader = new FileReader();
 
   const promise = new Promise<string>((resolve, reject) => {

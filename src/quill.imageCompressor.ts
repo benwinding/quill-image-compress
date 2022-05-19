@@ -2,21 +2,20 @@ import { ImageDrop } from "./quill.imageDrop";
 import { warnAboutOptions } from "./options.validation";
 import { file2b64 } from "./file2b64";
 import { downscaleImage } from "./downscaleImage";
-import Quill from "quill";
+import Quill, { RangeStatic } from "quill";
 import { ConsoleLogger } from './ConsoleLogger';
 import { OptionsObject } from "./options.object";
 
 class imageCompressor {
   private quill: Quill;
-  private range: any;
+  private range?: RangeStatic | null;
   private options: OptionsObject;
-  private imageDrop: any;
+  private imageDrop: ImageDrop;
   private fileHolder: HTMLInputElement | undefined;
   private Logger: ConsoleLogger;
 
   constructor(quill: Quill, options: OptionsObject) {
     this.quill = quill;
-    this.range = null;
     this.options = options || {};
     const debug = !!options.debug;
     const suppressErrorLogging = !!options.suppressErrorLogging;
@@ -94,6 +93,9 @@ class imageCompressor {
     this.Logger.log('insertToEditor', {url});
     this.range = this.quill.getSelection();
     const range = this.range;
+    if (!range) {
+      return;
+    }
     // Insert the compressed image
     this.logFileSize(url);
     this.quill.insertEmbed(range.index, "image", `${url}`, "user");
