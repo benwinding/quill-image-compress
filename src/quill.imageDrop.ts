@@ -1,14 +1,17 @@
+import Quill from "quill";
+import { ConsoleLogger } from "./ConsoleLogger";
+
 const { file2b64 } = require("./file2b64");
 
 /* 
 From: https://github.com/kensnyder/quill-image-drop-module/blob/master/index.js
 */
 export class ImageDrop {
-  constructor(quill, onNewDataUrl, logger) {
-    // save the quill reference
-    this.logger = logger;
-    this.quill = quill;
-    this.onNewDataUrl = onNewDataUrl;
+  constructor(
+    private quill: Quill,
+    private onNewDataUrl: (file: any) => void,
+    private logger: ConsoleLogger,
+  ) {
     // listen for drop and paste events
     this.quill.root.addEventListener("drop", (e) => this.handleDrop(e), false);
     this.quill.root.addEventListener(
@@ -18,11 +21,11 @@ export class ImageDrop {
     );
   }
 
-  async handleNewImageFiles(imageFiles) {
+  async handleNewImageFiles(imageFiles: File[]) {
     if (!Array.isArray(imageFiles)) {
       return;
     }
-    const firstImage = imageFiles.pop();
+    const firstImage = imageFiles.pop() as any;
     if (!firstImage) {
       return;
     }
@@ -32,7 +35,7 @@ export class ImageDrop {
     this.onNewDataUrl(base64ImageSrc);
   }
 
-  handleDrop(evt) {
+  handleDrop(evt: DragEvent) {
     evt.preventDefault();
     const hasFiles =
       evt.dataTransfer &&
@@ -54,11 +57,11 @@ export class ImageDrop {
         );
       }
     }
-    const images = this.getImageFiles(evt.dataTransfer.files);
+    const images = this.getImageFiles(evt.dataTransfer.files as any);
     this.handleNewImageFiles(images);
   }
 
-  handlePaste(evt) {
+  handlePaste(evt: ClipboardEvent) {
     const hasItems =
       evt.clipboardData &&
       evt.clipboardData.items &&
@@ -67,7 +70,7 @@ export class ImageDrop {
     if (!hasItems) {
       return;
     }
-    const images = this.getImageFiles(evt.clipboardData.items);
+    const images = this.getImageFiles(evt.clipboardData.items as any);
     const hasImages = images.length > 0;
     this.logger.log("handlePaste", { hasImages, imageCount: images.length });
     if (!hasImages) {
@@ -84,11 +87,11 @@ export class ImageDrop {
     this.handleNewImageFiles(images);
   }
 
-  getImageFiles(filesList) {
+  getImageFiles(filesList: any[]) {
     const files = Array.from(filesList);
     this.logger.log("getImageFiles", { mimeTypes: files.map(f => f.type) });
     // check each file for an image
-    function isFileImage(file) {
+    function isFileImage(file: DataTransferItem) {
       const isImage = !!file.type.match(
         /^image\/(gif|jpe?g|a?png|svg|webp|bmp)/i
         );

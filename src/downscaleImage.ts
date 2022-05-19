@@ -1,13 +1,15 @@
+import { ConsoleLogger } from "ConsoleLogger";
+
 // Take an image URL, downscale it to the given width, and return a new image URL.
 export async function downscaleImage(
-  dataUrl,
-  maxWidth,
-  maxHeight,
-  imageType,
-  keepImageTypes,
-  ignoreImageTypes,
-  imageQuality,
-  logger,
+  logger: ConsoleLogger,
+  dataUrl: string,
+  maxWidth?: number,
+  maxHeight?: number,
+  imageType?: string,
+  keepImageTypes?: string[],
+  ignoreImageTypes?: string[],
+  imageQuality?: number,
 ) {
   "use strict";
   // Input image values
@@ -20,7 +22,7 @@ export async function downscaleImage(
   // Create a temporary image so that we can compute the height of the downscaled image.
   const image = new Image();
   image.src = dataUrl;
-  await new Promise((resolve) => {
+  await new Promise<void>((resolve) => {
     image.onload = () => {
       resolve();
     };
@@ -37,8 +39,8 @@ export async function downscaleImage(
   canvas.width = newWidth;
   canvas.height = newHeight;
 
-  const ctx = canvas.getContext("2d");
-  
+  const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+
   // If the type is an jpeg, draw a white background first.
   if (imageType === "image/jpeg") {
     ctx.fillStyle = "#FFFFFF";
@@ -46,12 +48,12 @@ export async function downscaleImage(
   }
 
   // If the type is included in the ignore list, return the original
-  if (ignoreImageTypes.includes(inputImageType)) {
+  if (ignoreImageTypes?.includes(inputImageType)) {
     return dataUrl;
   }
 
   // If the type is included in keep type list, fix the image type
-  if (keepImageTypes.includes(inputImageType)) {
+  if (keepImageTypes?.includes(inputImageType)) {
     imageType = inputImageType;
   }
 
@@ -74,15 +76,20 @@ export async function downscaleImage(
   return newDataUrl;
 }
 
-function getDimensions(inputWidth, inputHeight, maxWidth, maxHeight) {
-  if (inputWidth <= maxWidth && inputHeight <= maxHeight) {
+function getDimensions(
+  inputWidth: number, 
+  inputHeight: number, 
+  maxWidth?: number, 
+  maxHeight?: number
+): [number, number] {
+  if (maxWidth && maxHeight && inputWidth <= maxWidth && inputHeight <= maxHeight) {
     return [inputWidth, inputHeight];
   }
-  if (inputWidth > maxWidth) {
+  if (maxWidth && inputWidth > maxWidth) {
     const newWidth = maxWidth;
     const newHeight = Math.floor((inputHeight / inputWidth) * newWidth);
 
-    if (newHeight > maxHeight) {
+    if (maxHeight && newHeight > maxHeight) {
       const newHeight = maxHeight;
       const newWidth = Math.floor((inputWidth / inputHeight) * newHeight);
       return [newWidth, newHeight];
@@ -90,9 +97,10 @@ function getDimensions(inputWidth, inputHeight, maxWidth, maxHeight) {
       return [newWidth, newHeight];
     }
   }
-  if (inputHeight > maxHeight) {
+  if (maxHeight && inputHeight > maxHeight) {
     const newHeight = maxHeight;
     const newWidth = Math.floor((inputWidth / inputHeight) * newHeight);
     return [newWidth, newHeight];
   }
+  return [inputHeight, inputWidth];
 }

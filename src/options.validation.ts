@@ -1,4 +1,7 @@
-export function warnAboutOptions(options) {
+import { OptionsObject } from 'options.object';
+import { ConsoleLogger } from './ConsoleLogger';
+
+export function warnAboutOptions(options: OptionsObject, Logger: ConsoleLogger) {
   // Safe-ify Options
   options.maxWidth = options.maxWidth || 1000;
   options.maxHeight = options.maxHeight || 1000;
