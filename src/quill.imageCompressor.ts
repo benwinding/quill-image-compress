@@ -14,6 +14,17 @@ class imageCompressor {
   private fileHolder: HTMLInputElement | undefined;
   private Logger: ConsoleLogger;
 
+  static b64toBlob(dataURI: string) {
+    const byteString = atob(dataURI.split(',')[1]);
+    const type = dataURI.slice(5).split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    let ia = new Uint8Array(ab);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: type });
+  }
+
   constructor(quill: Quill, options: OptionsObject) {
     this.quill = quill;
     this.options = options || {};
@@ -25,7 +36,7 @@ class imageCompressor {
     const onImageDrop = async (dataUrl: string) => {
       this.Logger.log("onImageDrop", { dataUrl });
       const dataUrlCompressed = await this.downscaleImageFromUrl(dataUrl);
-      this.insertToEditor(dataUrlCompressed);
+      this.insertToEditor(dataUrlCompressed, imageCompressor.b64toBlob(dataUrlCompressed));
     };
     this.imageDrop = new ImageDrop(quill, onImageDrop, this.Logger);
 
@@ -71,7 +82,7 @@ class imageCompressor {
     const base64ImageSmallSrc = await this.downscaleImageFromUrl(
       base64ImageSrc
     );
-    this.insertToEditor(base64ImageSmallSrc);
+    this.insertToEditor(base64ImageSmallSrc, imageCompressor.b64toBlob(base64ImageSmallSrc));
   }
 
   async downscaleImageFromUrl(dataUrl: string) {
@@ -89,19 +100,23 @@ class imageCompressor {
     return dataUrlCompressed;
   }
 
-  insertToEditor(url: string) {
-    this.Logger.log('insertToEditor', {url});
-    this.range = this.quill.getSelection();
-    const range = this.range;
-    if (!range) {
-      return;
+  insertToEditor(url: string, blob: Blob) {
+    if (this.options.insertIntoEditor) {
+      this.options.insertIntoEditor(url, blob);
+    } else {
+      this.Logger.log('insertToEditor', {url});
+      this.range = this.quill.getSelection();
+      const range = this.range;
+      if (!range) {
+        return;
+      }
+      // Insert the compressed image
+      this.logFileSize(url);
+      this.quill.insertEmbed(range.index, "image", `${url}`, "user");
+      // Move cursor to next position
+      range.index++;
+      this.quill.setSelection(range, "api");
     }
-    // Insert the compressed image
-    this.logFileSize(url);
-    this.quill.insertEmbed(range.index, "image", `${url}`, "user");
-    // Move cursor to next position
-    range.index++;
-    this.quill.setSelection(range, "api");
   }
 
   logFileSize(dataUrl: string) {
