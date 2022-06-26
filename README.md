@@ -45,6 +45,7 @@ const quill = new Quill(editor, {
       imageType: 'image/jpeg', // default
       debug: true, // default
       suppressErrorLogging: false, // default
+      insertIntoEditor: undefined, // default
     }
   }
 });
@@ -87,9 +88,28 @@ const quill = new Quill(editor, {
   Image types contained in this array retain their original images, do not compress them.
   - Values: ['image'/jpeg', 'image/webp']
 
+- **[Function] insertIntoEditor**
+  Custom function to handle inserting the image. If you wanted to upload the image to a webserver rather than embedding with Base64, you could use this function.
+  - Example function, uploading to a webserver:
+    ```js
+    insertIntoEditor: (imageBase64URL, imageBlob) => {    
+      const formData = new FormData();
+      formData.append("file", imageBlob);
+
+      fetch("/upload", {method: "POST", body: formData})
+        .then(response => response.text())
+        .then(result => {
+          const range = editor.getSelection();
+          editor.insertEmbed(range.index, "image", `${result}`, "user");
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
+    ```
+
 - **[Boolean] debug**
   - Displays console logs: true/false
 
 ## Thanks
 This project is based on [quill-image-uploader](https://github.com/NoelOConnell/quill-image-uploader), thanks mate!
-
