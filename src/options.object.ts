@@ -9,4 +9,5 @@ export type OptionsObject = {
   keepImageTypes?: string[];
   ignoreImageTypes?: string[];
   quality?: number;
+  insertIntoEditor?: (base64URL: string, imageBlob: Blob) => void;
 };

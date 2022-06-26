@@ -66,4 +66,10 @@ received: ${options.imageType}
     )
     options.ignoreImageTypes = [];
   }
+  if (options.insertIntoEditor && typeof options.insertIntoEditor !== "function") {
+    Logger.warn(
+      `quill.imageCompressor: [config error] 'insertIntoEditor' is required to be a "function", received: ${options.insertIntoEditor} -> using default undefined`
+    )
+    options.insertIntoEditor = undefined;
+  }
 }
