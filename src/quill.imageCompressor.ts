@@ -68,8 +68,8 @@ class imageCompressor {
     });
   }
 
-  async fileChanged(files?: File[]) {
-    files = files || this.fileHolder?.files;
+  async fileChanged(externallyProvidedFiles?: File[]) {
+    const files = externallyProvidedFiles || this.fileHolder?.files;
     if (!files || !files.length) {
       return;
     }
