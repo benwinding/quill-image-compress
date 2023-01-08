@@ -3,3 +3,4 @@ yarn*
 package-*
 dist
 types
+.DS_Store

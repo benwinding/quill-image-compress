@@ -50,14 +50,14 @@ class imageCompressor {
     }
   }
 
-  selectLocalImage() {
+  selectLocalImage(onFileChanged?: () => void) {
     this.range = this.quill.getSelection();
     this.fileHolder = document.createElement("input");
     this.fileHolder.setAttribute("type", "file");
     this.fileHolder.setAttribute("accept", "image/*");
     this.fileHolder.setAttribute("style", "visibility:hidden");
 
-    this.fileHolder.onchange = () => this.fileChanged();
+    this.fileHolder.onchange = () => this.fileChanged().then(() => onFileChanged && onFileChanged());
 
     document.body.appendChild(this.fileHolder);
 
@@ -68,8 +68,8 @@ class imageCompressor {
     });
   }
 
-  async fileChanged() {
-    const files = this.fileHolder?.files;
+  async fileChanged(externallyProvidedFiles?: File[]) {
+    const files = externallyProvidedFiles || this.fileHolder?.files;
     if (!files || !files.length) {
       return;
     }
