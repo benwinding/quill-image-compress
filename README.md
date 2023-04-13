@@ -92,7 +92,7 @@ const quill = new Quill(editor, {
   Custom function to handle inserting the image. If you wanted to upload the image to a webserver rather than embedding with Base64, you could use this function.
   - Example function, uploading to a webserver:
     ```js
-    insertIntoEditor: (imageBase64URL, imageBlob) => {    
+    insertIntoEditor: (imageBase64URL, imageBlob, editor) => {    
       const formData = new FormData();
       formData.append("file", imageBlob);
 
