@@ -1,3 +1,4 @@
+import Quill from "quill";
 
 export type OptionsObject = {
   validation?: boolean;
