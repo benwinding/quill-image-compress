@@ -1,3 +1,4 @@
+import Quill from "quill";
 
 export type OptionsObject = {
   validation?: boolean;
@@ -9,5 +10,5 @@ export type OptionsObject = {
   keepImageTypes?: string[];
   ignoreImageTypes?: string[];
   quality?: number;
-  insertIntoEditor?: (base64URL: string, imageBlob: Blob) => void;
+  insertIntoEditor?: (base64URL: string, imageBlob: Blob, editor: Quill) => void;
 };

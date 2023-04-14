@@ -102,7 +102,7 @@ class imageCompressor {
 
   insertToEditor(url: string, blob: Blob) {
     if (this.options.insertIntoEditor) {
-      this.options.insertIntoEditor(url, blob);
+      this.options.insertIntoEditor(url, blob, this.quill);
     } else {
       this.Logger.log('insertToEditor', {url});
       this.range = this.quill.getSelection();
