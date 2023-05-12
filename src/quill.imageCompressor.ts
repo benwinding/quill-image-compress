@@ -55,6 +55,7 @@ class imageCompressor {
     this.fileHolder = document.createElement("input");
     this.fileHolder.setAttribute("type", "file");
     this.fileHolder.setAttribute("accept", "image/*");
+    this.fileHolder.setAttribute("multiple", "");
     this.fileHolder.setAttribute("style", "visibility:hidden");
 
     this.fileHolder.onchange = () => this.fileChanged().then(() => onFileChanged && onFileChanged());
@@ -73,7 +74,10 @@ class imageCompressor {
     if (!files || !files.length) {
       return;
     }
-    const file = files[0];
+
+    const filesArray = Array.from(files)
+
+    filesArray.forEach(async file => {
     this.Logger.log("fileChanged", { file });
     if (!file) {
       return;
@@ -83,6 +87,7 @@ class imageCompressor {
       base64ImageSrc
     );
     this.insertToEditor(base64ImageSmallSrc, imageCompressor.b64toBlob(base64ImageSmallSrc));
+    })
   }
 
   async downscaleImageFromUrl(dataUrl: string) {

@@ -37,25 +37,34 @@ export class ImageDrop {
     }
     const files = await getFilesFromDragEvent(evt);
     const filesFiltered = Array.from(files || []).filter(f => IsMatch(f.type));
-    const firstImage = filesFiltered?.[0];
-    if (firstImage) {
-      const base64ImageSrc = await file2b64(firstImage);
-      this.logger.log("handleNewImageFiles", { evt, files, filesFiltered, firstImage, base64ImageSrc });
-      this.onNewDataUrl(base64ImageSrc);
-      return;
-    }
-    const blob = await getBlobFromDragEvent(evt);
-    if (!!blob) {
-      const base64ImageSrc = await file2b64(blob);
-      this.logger.log("handleNewImageFiles", { evt, blob, base64ImageSrc });
-      this.onNewDataUrl(base64ImageSrc);
-      return;
-    }
+
+    filesFiltered.forEach(async image => {
+      if (image) {
+        const base64ImageSrc = await file2b64(image);
+        this.logger.log("handleNewImageFiles", { evt, files, filesFiltered, image, base64ImageSrc });
+        this.onNewDataUrl(base64ImageSrc);
+        return;
+      }
+
+      const blob = await getBlobFromDragEvent(evt);
+      if (!!blob) {
+        const base64ImageSrc = await file2b64(blob);
+        this.logger.log("handleNewImageFiles", { evt, blob, base64ImageSrc });
+        this.onNewDataUrl(base64ImageSrc);
+        return;
+      }
+    })
   }
 
   private async handlePaste(evt: ClipboardEvent) {
     const files = Array.from(evt?.clipboardData?.items || []);
     this.logger.log("handlePaste", { files, evt });
+
+    // Text pasted from word will contain text/rtf
+    const isRichTextPaste = files.find(f => f.type === 'text/rtf')
+    if (isRichTextPaste) {
+      return;
+    }
     const images = files.filter(f => IsMatch(f.type));
     this.logger.log("handlePaste", { images, evt });
     if (!images.length) {
@@ -68,13 +77,16 @@ export class ImageDrop {
       return;
     }
     evt.preventDefault();
-    const blob = images.pop()?.getAsFile();
-    if (!blob) {
-      return;
-    }
-    const base64ImageSrc = await file2b64(blob);
-    this.logger.log("handleNewImageFiles", { base64ImageSrc });
-    this.onNewDataUrl(base64ImageSrc);
+
+    imagesNoHtml.forEach(async image => {
+      const blob = image?.getAsFile()
+      if (!blob) {
+        return;
+      }
+      const base64ImageSrc = await file2b64(blob);
+      this.logger.log("handleNewImageFiles", { base64ImageSrc });
+      this.onNewDataUrl(base64ImageSrc);  
+    })
   }
 }
 
