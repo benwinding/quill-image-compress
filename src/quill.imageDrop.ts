@@ -7,12 +7,16 @@ import { file2b64 } from "./file2b64";
 From: https://github.com/kensnyder/quill-image-drop-module/blob/master/index.js
 */
 export class ImageDrop {
+  localDrag: boolean = false;
+
   constructor(
     private quill: Quill,
     private onNewDataUrl: (dataUrl: string) => void,
     private logger: ConsoleLogger,
   ) {
     // listen for drop and paste events
+    this.quill.root.addEventListener("dragstart", (e) => this.handleDragStart(e), false);
+    this.quill.root.addEventListener("dragend", (e) => this.handleDragEnd(e), false);
     this.quill.root.addEventListener("drop", (e) => this.handleDrop(e), false);
     this.quill.root.addEventListener(
       "paste",
@@ -21,7 +25,17 @@ export class ImageDrop {
     );
   }
 
+  private handleDragStart(evt: DragEvent) {
+    this.localDrag = true;
+  }
+
+  private handleDragEnd(evt: DragEvent) {
+    this.localDrag = false;
+  }
+
   private async handleDrop(evt: DragEvent) {
+    if (this.localDrag)
+      return; // use default method
     evt.preventDefault();
     if (document.caretRangeFromPoint) {
       const selection = document.getSelection();
