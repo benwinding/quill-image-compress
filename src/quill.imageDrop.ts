@@ -76,7 +76,7 @@ export class ImageDrop {
       return;
     }
     // Text pasted from word will contain both text/html and image/png.
-    const filesHasHtml = images.some(f => f.type === 'text/html');
+    const filesHasHtml = files.some(f => f.type === 'text/html');
     if (filesHasHtml) {
       this.logger.log("handlePaste also detected html");
       return;
