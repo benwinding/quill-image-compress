@@ -68,18 +68,13 @@ export class ImageDrop {
   }
 
   private async handlePaste(evt: ClipboardEvent) {
-    const files = Array.from(evt?.clipboardData?.items || []);
-    const images = files.filter(f => IsMatch(f.type));
-    const fileTypes = files.map(f => ({ type: f.type, kind: f.kind })); // Browser wipes logging clipboard
-    this.logger.log("handlePaste", { images, fileTypes, evt });
+    const items = Array.from(evt.clipboardData?.items || []);
+    // Can only compress images of type "file"
+    const images = items.filter(f => f.kind === 'file' && IsMatch(f.type));
+    const fileTypes = items.map(f => ({ type: f.type, kind: f.kind }));
+    this.logger.log("handlePaste", { evt, fileTypes, imageCount: images.length });
     if (!images.length) {
-      // No images in clipboard, proceed with inbuilt quill paste
-      return;
-    }
-    // Text pasted from word will contain both text/html and image/png.
-    const imagesNoHtml = images.filter(f => f.type !== 'text/html');
-    if (!imagesNoHtml.length) {
-      this.logger.log("handlePaste also detected html");
+      // No images in clipboard, proceed with inbuilt paste into quill
       return;
     }
     evt.preventDefault();
