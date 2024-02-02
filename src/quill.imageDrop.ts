@@ -69,10 +69,11 @@ export class ImageDrop {
 
   private async handlePaste(evt: ClipboardEvent) {
     const files = Array.from(evt?.clipboardData?.items || []);
-    this.logger.log("handlePaste", { files, evt });
     const images = files.filter(f => IsMatch(f.type));
-    this.logger.log("handlePaste", { images, evt });
+    const fileTypes = files.map(f => ({ type: f.type, kind: f.kind })); // Browser wipes logging clipboard
+    this.logger.log("handlePaste", { images, fileTypes, evt });
     if (!images.length) {
+      // No images in clipboard, proceed with inbuilt quill paste
       return;
     }
     // Text pasted from word will contain both text/html and image/png.
