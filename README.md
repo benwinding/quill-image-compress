@@ -24,6 +24,7 @@ Quill.js Module which compresses images that are uploaded to the editor
 - Handles most image formats a browser can read:
   - `gif|jpeg|png|svg|webp|bmp|vnd`
 - Compression options [more info](#options)
+- Add multiple images in one drag/paste
 
 _NOTE: :exclamation:you don't need `quill-image-drop-module`, it's included in this package:exclamation:_
 

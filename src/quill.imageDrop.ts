@@ -49,60 +49,59 @@ export class ImageDrop {
         );
       }
     }
-    const files = await getFilesFromDragEvent(evt);
-    const filesFiltered = Array.from(files || []).filter(f => IsMatch(f.type));
-    const firstImage = filesFiltered?.[0];
-    if (firstImage) {
-      const base64ImageSrc = await file2b64(firstImage);
-      this.logger.log("handleNewImageFiles", { evt, files, filesFiltered, firstImage, base64ImageSrc });
-      this.onNewDataUrl(base64ImageSrc);
+    this.logger.log("handleDrop", {evt});
+    const files = evt.dataTransfer?.files;
+    const imageFiles = Array.from(files || []).filter(f => IsMatch(f.type));
+    if (imageFiles.length > 0) {
+      this.logger.log("handleDrop", "found files", { evt, files, imageFiles });
+      await this.pasteFilesIntoQuill(imageFiles);
       return;
     }
-    const blob = await getBlobFromDragEvent(evt);
-    if (!!blob) {
-      const base64ImageSrc = await file2b64(blob);
-      this.logger.log("handleNewImageFiles", { evt, blob, base64ImageSrc });
-      this.onNewDataUrl(base64ImageSrc);
+    if (evt.dataTransfer?.items) {
+      this.logger.log("handleDrop", "found items", { evt, files, imageFiles });
+      await this.handleDataTransferList(evt.dataTransfer?.items, evt);
       return;
+    }
+    const draggedUrl = evt.dataTransfer?.getData('URL');
+    this.logger.log("handleDrop", "trying getData('URL')", {draggedUrl});
+    if (draggedUrl) {
+      const blob = await (await fetch(draggedUrl)).blob();
+      this.logger.log("handleDrop", "blob from drag event", { evt, files, imageFiles });
+      await this.pasteFilesIntoQuill([blob]);
     }
   }
 
   private async handlePaste(evt: ClipboardEvent) {
-    const files = Array.from(evt?.clipboardData?.items || []);
-    this.logger.log("handlePaste", { files, evt });
-    const images = files.filter(f => IsMatch(f.type));
-    this.logger.log("handlePaste", { images, evt });
+    await this.handleDataTransferList(evt.clipboardData?.items, evt);
+  }
+
+  private async handleDataTransferList(dataTransferItems: DataTransferItemList | undefined, evt: { preventDefault: () => void }) {
+    const items = Array.from(dataTransferItems || []);
+    // Can only compress images of type "file"
+    const images = items.filter(f => f.kind === 'file' && IsMatch(f.type));
+    const fileTypes = items.map(f => ({ type: f.type, kind: f.kind }));
+    this.logger.log("handleDataTransferList", { fileTypes, imageCount: images.length });
     if (!images.length) {
-      return;
-    }
-    // Text pasted from word will contain both text/html and image/png.
-    const filesHasHtml = files.some(f => f.type === 'text/html');
-    if (filesHasHtml) {
-      this.logger.log("handlePaste also detected html");
+      // No images in clipboard, proceed with inbuilt paste into quill
       return;
     }
     evt.preventDefault();
-    const blob = images.pop()?.getAsFile();
-    if (!blob) {
-      return;
-    }
-    const base64ImageSrc = await file2b64(blob);
-    this.logger.log("handleNewImageFiles", { base64ImageSrc });
-    this.onNewDataUrl(base64ImageSrc);
+    const imageFiles = images.map(image => image.getAsFile());
+    await this.pasteFilesIntoQuill(imageFiles);
   }
-}
 
-async function getBlobFromDragEvent(evt: DragEvent): Promise<Blob | undefined> {
-  const draggedUrl = evt.dataTransfer?.getData('URL');
-  if (draggedUrl) {
-    const blob = await (await fetch(draggedUrl)).blob();
-    return blob;
+  private async pasteFilesIntoQuill(imageFiles: (Blob | null)[]) {
+    this.logger.log("    pasteFilesIntoQuill", `pasting ${imageFiles.length} images...`);
+    await Promise.all(imageFiles.map(async (imageFile, index) => {
+      if (!imageFile) {
+        return;
+      }
+      const base64ImageSrc = await file2b64(imageFile);
+      this.logger.log("    pasteFilesIntoQuill", `pasting image (${index})`);
+      this.onNewDataUrl(base64ImageSrc);
+    }));
+    this.logger.log("    pasteFilesIntoQuill", "done");
   }
-}
-
-async function getFilesFromDragEvent(evt: DragEvent): Promise<FileList | undefined> {
-  const files = evt?.dataTransfer?.files;
-  return files;
 }
 
 function IsMatch(fileType: string): boolean {
