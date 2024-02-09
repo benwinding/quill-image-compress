@@ -1,6 +1,6 @@
 import Quill from "quill";
 import { ConsoleLogger } from "./ConsoleLogger";
-
+import Delta from "quill-delta";
 import { file2b64 } from "./file2b64";
 
 /*
@@ -46,7 +46,7 @@ export class ImageDrop {
         );
       }
     }
-    this.logger.log("handleDrop", {evt});
+    this.logger.log("handleDrop", { evt });
     const files = evt.dataTransfer?.files;
     const imageFiles = Array.from(files || []).filter(f => IsMatch(f.type));
     if (imageFiles.length > 0) {
@@ -56,11 +56,11 @@ export class ImageDrop {
     }
     if (evt.dataTransfer?.items) {
       this.logger.log("handleDrop", "found items", { evt, files, imageFiles });
-      await this.handleDataTransferList(evt.dataTransfer?.items, evt);
+      await this.handleDataTransferList(evt.dataTransfer!, evt);
       return;
     }
     const draggedUrl = evt.dataTransfer?.getData('URL');
-    this.logger.log("handleDrop", "trying getData('URL')", {draggedUrl});
+    this.logger.log("handleDrop", "trying getData('URL')", { draggedUrl });
     if (draggedUrl) {
       const blob = await (await fetch(draggedUrl)).blob();
       this.logger.log("handleDrop", "blob from drag event", { evt, files, imageFiles });
@@ -69,15 +69,18 @@ export class ImageDrop {
   }
 
   private async handlePaste(evt: ClipboardEvent) {
-    await this.handleDataTransferList(evt.clipboardData?.items, evt);
+    if (evt.clipboardData) {
+      await this.handleDataTransferList(evt.clipboardData!, evt);
+    }
   }
 
-  private async handleDataTransferList(dataTransferItems: DataTransferItemList | undefined, evt: { preventDefault: () => void }) {
-    const items = Array.from(dataTransferItems || []);
+  private async handleDataTransferList(dataTransfer: DataTransfer, evt: Event) {
+    const items = Array.from(dataTransfer.items || []);
     // Can only compress images of type "file"
     const images = items.filter(f => f.kind === 'file' && IsMatch(f.type));
     const fileTypes = items.map(f => ({ type: f.type, kind: f.kind }));
     this.logger.log("handleDataTransferList", { fileTypes, imageCount: images.length });
+
     if (!images.length) {
       // No images in clipboard, proceed with inbuilt paste into quill
       return;
