@@ -27,7 +27,7 @@ class imageCompressor {
     const onImageDrop = async (dataUrl: string) => {
       this.Logger.log("onImageDrop", { dataUrl });
       const dataUrlCompressed = await this.downscaleImageFromUrl(dataUrl);
-      this.insertToEditor(dataUrlCompressed, b64toBlob(dataUrlCompressed));
+      this.insertToEditor(dataUrlCompressed);
     };
     this.imageDrop = new ImageDrop(quill, onImageDrop, this.Logger);
 
@@ -73,7 +73,8 @@ class imageCompressor {
     const base64ImageSmallSrc = await this.downscaleImageFromUrl(
       base64ImageSrc
     );
-    this.insertToEditor(base64ImageSmallSrc, b64toBlob(base64ImageSmallSrc));
+
+    this.insertToEditor(base64ImageSmallSrc);
   }
 
   async downscaleImageFromUrl(dataUrl: string) {
@@ -91,23 +92,24 @@ class imageCompressor {
     return dataUrlCompressed;
   }
 
-  insertToEditor(url: string, blob: Blob) {
-    if (this.options.insertIntoEditor) {
-      this.options.insertIntoEditor(url, blob, this.quill);
-    } else {
-      this.Logger.log('insertToEditor', { url });
-      this.range = this.quill.getSelection();
-      const range = this.range;
-      if (!range) {
-        return;
-      }
-      // Insert the compressed image
-      this.logFileSize(url);
-      this.quill.insertEmbed(range.index, "image", `${url}`, "user");
-      // Move cursor to next position
-      range.index++;
-      this.quill.setSelection(range, "api");
+  async insertToEditor(url: string) {
+    if (this.options.uploadImage) {
+      url = await this.options.uploadImage(b64toBlob(url));
     }
+
+    this.Logger.log('insertToEditor', { url });
+    this.range = this.quill.getSelection();
+    const range = this.range;
+    if (!range) {
+      return;
+    }
+    // Insert the compressed image
+    this.logFileSize(url);
+    this.quill.insertEmbed(range.index, "image", `${url}`, "user");
+    // Move cursor to next position
+    range.index++;
+    this.quill.setSelection(range, "api");
+
   }
 
   logFileSize(dataUrl: string) {
