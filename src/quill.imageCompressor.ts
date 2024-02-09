@@ -26,8 +26,7 @@ class imageCompressor {
     warnAboutOptions(options, this.Logger);
     const onImageDrop = async (dataUrl: string) => {
       this.Logger.log("onImageDrop", { dataUrl });
-      const dataUrlCompressed = await this.downscaleImageFromUrl(dataUrl);
-      this.insertToEditor(dataUrlCompressed);
+      this.insertToEditor(await this.processImage(dataUrl));
     };
     this.imageDrop = new ImageDrop(quill, onImageDrop, this.Logger);
 
@@ -70,9 +69,7 @@ class imageCompressor {
       return;
     }
     const base64ImageSrc = await file2b64(file);
-    const base64ImageSmallSrc = await this.downscaleImageFromUrl(
-      base64ImageSrc
-    );
+    const base64ImageSmallSrc = await this.processImage(base64ImageSrc);
 
     this.insertToEditor(base64ImageSmallSrc);
   }
@@ -92,10 +89,15 @@ class imageCompressor {
     return dataUrlCompressed;
   }
 
-  async insertToEditor(url: string) {
+  async processImage(dataUrl: string): Promise<string> {
+    dataUrl = await this.downscaleImageFromUrl(dataUrl);
     if (this.options.uploadImage) {
-      url = await this.options.uploadImage(b64toBlob(url));
+      dataUrl = await this.options.uploadImage(b64toBlob(dataUrl));
     }
+    return dataUrl;
+  }
+
+  async insertToEditor(url: string) {
 
     this.Logger.log('insertToEditor', { url });
     this.range = this.quill.getSelection();
