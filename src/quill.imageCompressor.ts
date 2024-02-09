@@ -97,7 +97,7 @@ class imageCompressor {
   async insertToEditor(url: string) {
 
     this.Logger.log('insertToEditor', { url });
-    this.range = this.quill.getSelection();
+    this.range = this.quill.getSelection(true);
     const range = this.range;
     if (!range) {
       return;

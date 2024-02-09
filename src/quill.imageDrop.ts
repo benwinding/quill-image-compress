@@ -108,7 +108,6 @@ export class ImageDrop {
     tmp.innerHTML = html;
     const imgNodeList = tmp.querySelectorAll('img');
 
-
     for (let i = 0; i < imgNodeList.length; i++) {
       const img = imgNodeList[i];
       if (img.src.startsWith("http")) {
@@ -119,9 +118,9 @@ export class ImageDrop {
     }
 
     this.logger.log("    processHtml", `pasting ${tmp} to quill...`);
-    var range = this.quill.getSelection();
-    
-    this.quill.clipboard.dangerouslyPasteHTML(range?.index ||0 , tmp.innerHTML,"user");
+    const range = this.quill.getSelection(true);
+    const index = range != undefined ? range.index : this.quill.getLength();
+    this.quill.clipboard.dangerouslyPasteHTML(index, tmp.innerHTML, "user");
   }
 
   private async pasteFilesIntoQuill(imageFiles: (Blob | null)[]) {
