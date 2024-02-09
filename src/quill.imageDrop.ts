@@ -49,16 +49,19 @@ export class ImageDrop {
     this.logger.log("handleDrop", { evt });
     const files = evt.dataTransfer?.files;
     const imageFiles = Array.from(files || []).filter(f => IsMatch(f.type));
+
     if (imageFiles.length > 0) {
       this.logger.log("handleDrop", "found files", { evt, files, imageFiles });
       await this.pasteFilesIntoQuill(imageFiles);
       return;
     }
+
     if (evt.dataTransfer?.items) {
       this.logger.log("handleDrop", "found items", { evt, files, imageFiles });
       await this.handleDataTransferList(evt.dataTransfer!, evt);
       return;
     }
+
     const draggedUrl = evt.dataTransfer?.getData('URL');
     this.logger.log("handleDrop", "trying getData('URL')", { draggedUrl });
     if (draggedUrl) {
@@ -76,6 +79,15 @@ export class ImageDrop {
 
   private async handleDataTransferList(dataTransfer: DataTransfer, evt: Event) {
     const items = Array.from(dataTransfer.items || []);
+
+    const html = dataTransfer.getData('text/html');
+    if (html) {
+      this.processHtml(html)
+        .catch(e => this.logger.error("error while processing pasted html", e));
+      evt.preventDefault();
+      return;
+    }
+
     // Can only compress images of type "file"
     const images = items.filter(f => f.kind === 'file' && IsMatch(f.type));
     const fileTypes = items.map(f => ({ type: f.type, kind: f.kind }));
@@ -88,6 +100,28 @@ export class ImageDrop {
     evt.preventDefault();
     const imageFiles = images.map(image => image.getAsFile());
     await this.pasteFilesIntoQuill(imageFiles);
+  }
+
+  private async processHtml(html: string) {
+
+    const tmp = document.createElement('div')
+    tmp.innerHTML = html;
+    const imgNodeList = tmp.querySelectorAll('img');
+
+
+    for (let i = 0; i < imgNodeList.length; i++) {
+      const img = imgNodeList[i];
+      if (img.src.startsWith("http")) {
+        const blob = await (await fetch(img.src)).blob()
+        img.src = await file2b64(blob);
+      }
+      img.src = await this.processImage(img.src);
+    }
+
+    this.logger.log("    processHtml", `pasting ${tmp} to quill...`);
+    var range = this.quill.getSelection();
+    
+    this.quill.clipboard.dangerouslyPasteHTML(range?.index ||0 , tmp.innerHTML,"user");
   }
 
   private async pasteFilesIntoQuill(imageFiles: (Blob | null)[]) {
