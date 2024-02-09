@@ -24,11 +24,8 @@ class imageCompressor {
     this.Logger = new ConsoleLogger(debug, suppressErrorLogging);
 
     warnAboutOptions(options, this.Logger);
-    const onImageDrop = async (dataUrl: string) => {
-      this.Logger.log("onImageDrop", { dataUrl });
-      this.insertToEditor(await this.processImage(dataUrl));
-    };
-    this.imageDrop = new ImageDrop(quill, onImageDrop, this.Logger);
+
+    this.imageDrop = new ImageDrop(quill, (i) => this.downscaleImageFromUrl(i), (i) => this.insertToEditor(i), this.Logger);
 
     this.Logger.log("fileChanged", { options, quill, debug });
 

@@ -11,18 +11,15 @@ export class ImageDrop {
 
   constructor(
     private quill: Quill,
-    private onNewDataUrl: (dataUrl: string) => void,
+    private processImage: (dataUrl: string) => Promise<string>,
+    private insertImage: (dataUrl: string) => void,
     private logger: ConsoleLogger,
   ) {
     // listen for drop and paste events
     this.quill.root.addEventListener("dragstart", (e) => this.handleDragStart(e), false);
     this.quill.root.addEventListener("dragend", (e) => this.handleDragEnd(e), false);
     this.quill.root.addEventListener("drop", (e) => this.handleDrop(e), false);
-    this.quill.root.addEventListener(
-      "paste",
-      (e) => this.handlePaste(e),
-      false
-    );
+    this.quill.root.addEventListener("paste", (e) => this.handlePaste(e), false);
   }
 
   private handleDragStart(evt: DragEvent) {
@@ -98,7 +95,7 @@ export class ImageDrop {
       }
       const base64ImageSrc = await file2b64(imageFile);
       this.logger.log("    pasteFilesIntoQuill", `pasting image (${index})`);
-      this.onNewDataUrl(base64ImageSrc);
+      this.insertImage(await this.processImage(base64ImageSrc));
     }));
     this.logger.log("    pasteFilesIntoQuill", "done");
   }
