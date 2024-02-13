@@ -25,7 +25,7 @@ class imageCompressor {
 
     warnAboutOptions(options, this.Logger);
 
-    this.imageDrop = new ImageDrop(quill,options, (i) => this.downscaleImageFromUrl(i), (i) => this.insertToEditor(i), this.Logger);
+    this.imageDrop = new ImageDrop(quill, options, (i) => this.downscaleImageFromUrl(i), (i) => this.insertToEditor(i), this.Logger);
 
     this.Logger.log("fileChanged", { options, quill, debug });
 
@@ -87,11 +87,11 @@ class imageCompressor {
   }
 
   async processImage(dataUrl: string): Promise<string> {
-    dataUrl = await this.downscaleImageFromUrl(dataUrl);
+    var downscaledImage = await this.downscaleImageFromUrl(dataUrl);
     if (this.options.uploadImage) {
-      dataUrl = await this.options.uploadImage(b64toBlob(dataUrl));
+      return await this.options.uploadImage(b64toBlob(downscaledImage));
     }
-    return dataUrl;
+    return downscaledImage;
   }
 
   async insertToEditor(url: string) {
