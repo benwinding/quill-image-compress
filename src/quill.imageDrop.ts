@@ -58,7 +58,7 @@ export class ImageDrop {
 
     if (evt.dataTransfer?.items) {
       this.logger.log("handleDrop", "found items", { evt, files, imageFiles });
-      await this.handleDataTransferList(evt.dataTransfer, evt);
+      await this.handleDataTransfer(evt.dataTransfer, evt);
       return;
     }
 
@@ -73,11 +73,11 @@ export class ImageDrop {
 
   private async handlePaste(evt: ClipboardEvent) {
     if (evt.clipboardData) {
-      await this.handleDataTransferList(evt.clipboardData, evt);
+      await this.handleDataTransfer(evt.clipboardData, evt);
     }
   }
 
-  private async handleDataTransferList(dataTransfer: DataTransfer, evt: Event) {
+  private async handleDataTransfer(dataTransfer: DataTransfer, evt: Event) {
     const items = Array.from(dataTransfer.items || []);
 
     const html = dataTransfer.getData('text/html');
