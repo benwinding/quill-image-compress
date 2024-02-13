@@ -1,6 +1,7 @@
 import Quill from "quill";
 import { ConsoleLogger } from "./ConsoleLogger";
 import { file2b64 } from "./file2b64";
+import { OptionsObject } from "options.object";
 
 /*
 From: https://github.com/kensnyder/quill-image-drop-module/blob/master/index.js
@@ -12,6 +13,7 @@ export class ImageDrop {
 
   constructor(
     private quill: Quill,
+    private options: OptionsObject,
     private processImage: (dataUrl: string) => Promise<string>,
     private insertImage: (dataUrl: string) => void,
     private logger: ConsoleLogger,
@@ -82,7 +84,7 @@ export class ImageDrop {
     const items = Array.from(dataTransfer.items || []);
 
     const html = dataTransfer.getData('text/html');
-    if (html) {
+    if (html && this.options.compressImagesInPastedHtml) {
       this.processHtml(html)
         .catch(e => this.logger.error("error while processing pasted html", e));
       evt.preventDefault();
@@ -112,7 +114,7 @@ export class ImageDrop {
     for (let i = 0; i < imgNodeList.length; i++) {
       const img = imgNodeList[i];
       if (img.src.startsWith("http")) {
-        img.src =  await fetch(img.src)
+        img.src = await fetch(img.src)
           .then(r => r.blob())
           .then(blob => file2b64(blob))
           .catch(e => {

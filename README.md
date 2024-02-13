@@ -81,6 +81,8 @@ const quill = new Quill(editor, {
   - Image quality range: 0.0 - 1.0
 - **[String] imageType**
   - Values: 'image/jpeg' , 'image/png' ... etc
+- **[boolean] compressImagesInPastedHtml**
+  - This flag sets if images in pasted HTML should be compressed. This also loads pasted remote images via `fetch()` and stores them as base64.
 - **[Array] keepImageTypes**  
   Preserve image type and apply quality, maxWidth, maxHeight options
   - Values: ['image/jpeg', 'image/png']

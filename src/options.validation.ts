@@ -42,6 +42,16 @@ received: ${options.imageType}
     );
     options.imageType = "image/jpeg";
   }
+  if (options.compressImagesInPastedHtml === undefined) {
+    options.compressImagesInPastedHtml = true;
+  }
+  if (typeof  options.compressImagesInPastedHtml !== "boolean") {
+    Logger.warn(
+      `quill.imageCompressor: [config error] 'compressImagesInPastedHtml' is not of type boolean -> using default  'true' `
+    );
+    options.compressImagesInPastedHtml = true;
+  }
+
   if (!options.keepImageTypes) {
     options.keepImageTypes = []
   }

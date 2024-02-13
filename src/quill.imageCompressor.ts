@@ -25,7 +25,7 @@ class imageCompressor {
 
     warnAboutOptions(options, this.Logger);
 
-    this.imageDrop = new ImageDrop(quill, (i) => this.downscaleImageFromUrl(i), (i) => this.insertToEditor(i), this.Logger);
+    this.imageDrop = new ImageDrop(quill,options, (i) => this.downscaleImageFromUrl(i), (i) => this.insertToEditor(i), this.Logger);
 
     this.Logger.log("fileChanged", { options, quill, debug });
 

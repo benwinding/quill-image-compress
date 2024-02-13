@@ -7,6 +7,7 @@ export type OptionsObject = {
   maxWidth?: number;
   maxHeight?: number;
   imageType?: string;
+  compressImagesInPastedHtml?:boolean;
   keepImageTypes?: string[];
   ignoreImageTypes?: string[];
   quality?: number;
