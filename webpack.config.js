@@ -1,7 +1,11 @@
 const path = require("path");
+const TerserPlugin = require("terser-webpack-plugin");
 
 const isProd = process.argv.includes("production");
 
+/**
+ * @type {import('webpack').Configuration}
+ */
 module.exports = [
   {
     entry: {
@@ -18,7 +22,15 @@ module.exports = [
       publicPath: "/dist/"
     },
     devServer: {
-      contentBase: "./src"
+      port: 8001,
+      hot: true,
+      static: {
+        directory: path.join(__dirname, 'src'),
+        serveIndex: true,
+      },
+      devMiddleware: {
+        writeToDisk: true,
+      },
     },
     externals: {
       quill: "Quill"
@@ -26,6 +38,15 @@ module.exports = [
     devtool: isProd ? undefined : "inline-source-map",
     resolve: {
       extensions: [".ts", ".js"],
+    },
+    optimization: {
+      minimize: true,
+      minimizer: [
+        new TerserPlugin({
+          extractComments: true,
+          parallel: true,
+        }),
+      ],
     },
     module: {
       rules: [
