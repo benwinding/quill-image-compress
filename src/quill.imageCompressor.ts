@@ -2,13 +2,14 @@ import { ImageDrop } from "./quill.imageDrop";
 import { warnAboutOptions } from "./options.validation";
 import { file2b64 } from "./file2b64";
 import { downscaleImage } from "./downscaleImage";
-import Quill, { RangeStatic } from "quill";
+import Quill, { Range } from "quill";
 import { ConsoleLogger } from './ConsoleLogger';
 import { OptionsObject } from "./options.object";
+import Toolbar from "quill/modules/toolbar";
 
 class imageCompressor {
   private quill: Quill;
-  private range?: RangeStatic | null;
+  private range?: Range | null;
   private options: OptionsObject;
   private imageDrop: ImageDrop;
   private fileHolder: HTMLInputElement | undefined;
@@ -42,7 +43,7 @@ class imageCompressor {
 
     this.Logger.log("fileChanged", { options, quill, debug });
 
-    var toolbar = this.quill.getModule("toolbar");
+    const toolbar = this.quill.getModule("toolbar") as Toolbar;
     if (toolbar) {
       toolbar.addHandler("image", () => this.selectLocalImage());
     } else {
