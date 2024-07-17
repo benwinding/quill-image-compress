@@ -46,6 +46,7 @@ const quill = new Quill(editor, {
       imageType: 'image/jpeg', // default
       debug: true, // default
       suppressErrorLogging: false, // default
+      handleOnPaste: true, //default 
       insertIntoEditor: undefined, // default
     }
   }
@@ -88,7 +89,8 @@ const quill = new Quill(editor, {
 - **[Array] ignoreImageTypes**  
   Image types contained in this array retain their original images, do not compress them.
   - Values: ['image'/jpeg', 'image/webp']
-
+- **[Boolean] handleOnPaste**
+  - Compress image on paste, the default behaviour. Set to false to disable processing pasted images.
 - **[Function] insertIntoEditor**
   Custom function to handle inserting the image. If you wanted to upload the image to a webserver rather than embedding with Base64, you could use this function.
   - Example function, uploading to a webserver:

@@ -66,6 +66,15 @@ received: ${options.imageType}
     )
     options.ignoreImageTypes = [];
   }
+  if (
+    options.handleOnPaste &&
+    (typeof options.handleOnPaste !== "boolean")
+  ) {
+    Logger.warn(
+      `quill.imageCompressor: [config error] 'handlePaste' is required to be a "boolean", received: ${options.ignoreImageTypes} -> using default true`
+    )
+    options.handleOnPaste = true;
+  }
   if (options.insertIntoEditor && typeof options.insertIntoEditor !== "function") {
     Logger.warn(
       `quill.imageCompressor: [config error] 'insertIntoEditor' is required to be a "function", received: ${options.insertIntoEditor} -> using default undefined`
