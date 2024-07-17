@@ -42,6 +42,16 @@ received: ${options.imageType}
     );
     options.imageType = "image/jpeg";
   }
+  if (options.compressImagesInPastedHtml === undefined) {
+    options.compressImagesInPastedHtml = true;
+  }
+  if (typeof  options.compressImagesInPastedHtml !== "boolean") {
+    Logger.warn(
+      `quill.imageCompressor: [config error] 'compressImagesInPastedHtml' is not of type boolean -> using default  'true' `
+    );
+    options.compressImagesInPastedHtml = true;
+  }
+
   if (!options.keepImageTypes) {
     options.keepImageTypes = []
   }
@@ -66,10 +76,10 @@ received: ${options.imageType}
     )
     options.ignoreImageTypes = [];
   }
-  if (options.insertIntoEditor && typeof options.insertIntoEditor !== "function") {
+  if (options.uploadImage && typeof options.uploadImage !== "function") {
     Logger.warn(
-      `quill.imageCompressor: [config error] 'insertIntoEditor' is required to be a "function", received: ${options.insertIntoEditor} -> using default undefined`
+      `quill.imageCompressor: [config error] 'uploadImage' is required to be a "function", received: ${options.uploadImage} -> using default undefined`
     )
-    options.insertIntoEditor = undefined;
+    options.uploadImage = undefined;
   }
 }

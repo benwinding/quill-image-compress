@@ -81,6 +81,8 @@ const quill = new Quill(editor, {
   - Image quality range: 0.0 - 1.0
 - **[String] imageType**
   - Values: 'image/jpeg' , 'image/png' ... etc
+- **[boolean] compressImagesInPastedHtml**
+  - This flag sets if images in pasted HTML should be compressed. This also loads pasted remote images via `fetch()` and stores them as base64.
 - **[Array] keepImageTypes**  
   Preserve image type and apply quality, maxWidth, maxHeight options
   - Values: ['image/jpeg', 'image/png']
@@ -89,23 +91,16 @@ const quill = new Quill(editor, {
   Image types contained in this array retain their original images, do not compress them.
   - Values: ['image'/jpeg', 'image/webp']
 
-- **[Function] insertIntoEditor**
-  Custom function to handle inserting the image. If you wanted to upload the image to a webserver rather than embedding with Base64, you could use this function.
+- **[Function] uploadImage**
+  Custom function to handle uploading the image. If you wanted to upload the image to a webserver rather than embedding with Base64.
   - Example function, uploading to a webserver:
     ```js
-    insertIntoEditor: (imageBase64URL, imageBlob, editor) => {    
-      const formData = new FormData();
-      formData.append("file", imageBlob);
+    uploadImage: (imageBlob) => {    
+        const formData = new FormData();
+        formData.append("file", imageBlob);
 
-      fetch("/upload", {method: "POST", body: formData})
-        .then(response => response.text())
-        .then(result => {
-          const range = editor.getSelection();
-          editor.insertEmbed(range.index, "image", `${result}`, "user");
-        })
-        .catch(error => {
-          console.error(error);
-        });
+        return fetch("/upload", {method: "POST", body: formData})
+          .then(response => response.text());
     }
     ```
 
