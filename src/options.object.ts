@@ -10,5 +10,6 @@ export type OptionsObject = {
   keepImageTypes?: string[];
   ignoreImageTypes?: string[];
   quality?: number;
+  handleOnPaste?: boolean;
   insertIntoEditor?: (base64URL: string, imageBlob: Blob, editor: Quill) => void;
 };

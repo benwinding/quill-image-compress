@@ -39,7 +39,7 @@ class imageCompressor {
       const dataUrlCompressed = await this.downscaleImageFromUrl(dataUrl);
       this.insertToEditor(dataUrlCompressed, imageCompressor.b64toBlob(dataUrlCompressed));
     };
-    this.imageDrop = new ImageDrop(quill, onImageDrop, this.Logger);
+    this.imageDrop = new ImageDrop(quill, onImageDrop, this.Logger, this.options.handleOnPaste !== false);
 
     this.Logger.log("fileChanged", { options, quill, debug });
 

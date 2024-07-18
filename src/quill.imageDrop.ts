@@ -13,16 +13,19 @@ export class ImageDrop {
     private quill: Quill,
     private onNewDataUrl: (dataUrl: string) => void,
     private logger: ConsoleLogger,
+    private handleOnPaste?: boolean
   ) {
     // listen for drop and paste events
     this.quill.root.addEventListener("dragstart", (e) => this.handleDragStart(e), false);
     this.quill.root.addEventListener("dragend", (e) => this.handleDragEnd(e), false);
     this.quill.root.addEventListener("drop", (e) => this.handleDrop(e), false);
-    this.quill.root.addEventListener(
-      "paste",
-      (e) => this.handlePaste(e),
-      false
-    );
+    if (this.handleOnPaste) {
+      this.quill.root.addEventListener(
+        "paste",
+        (e) => this.handlePaste(e),
+        false
+      );
+    }
   }
 
   private handleDragStart(evt: DragEvent) {
@@ -49,7 +52,7 @@ export class ImageDrop {
         );
       }
     }
-    this.logger.log("handleDrop", {evt});
+    this.logger.log("handleDrop", { evt });
     const files = evt.dataTransfer?.files;
     const imageFiles = Array.from(files || []).filter(f => IsMatch(f.type));
     if (imageFiles.length > 0) {
@@ -63,7 +66,7 @@ export class ImageDrop {
       return;
     }
     const draggedUrl = evt.dataTransfer?.getData('URL');
-    this.logger.log("handleDrop", "trying getData('URL')", {draggedUrl});
+    this.logger.log("handleDrop", "trying getData('URL')", { draggedUrl });
     if (draggedUrl) {
       const blob = await (await fetch(draggedUrl)).blob();
       this.logger.log("handleDrop", "blob from drag event", { evt, files, imageFiles });
