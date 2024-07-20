@@ -18,12 +18,12 @@ export class ImageDrop {
     // listen for drop and paste events
     this.quill.root.addEventListener("dragstart", (e) => this.handleDragStart(e), false);
     this.quill.root.addEventListener("dragend", (e) => this.handleDragEnd(e), false);
-    this.quill.root.addEventListener("drop", (e) => this.handleDrop(e), false);
+    this.quill.root.addEventListener("drop", (e) => this.handleDrop(e), true);
     if (this.handleOnPaste) {
       this.quill.root.addEventListener(
         "paste",
         (e) => this.handlePaste(e),
-        false
+        true
       );
     }
   }
@@ -56,11 +56,13 @@ export class ImageDrop {
     const files = evt.dataTransfer?.files;
     const imageFiles = Array.from(files || []).filter(f => IsMatch(f.type));
     if (imageFiles.length > 0) {
+      evt.stopPropagation();
       this.logger.log("handleDrop", "found files", { evt, files, imageFiles });
       await this.pasteFilesIntoQuill(imageFiles);
       return;
     }
     if (evt.dataTransfer?.items) {
+      evt.stopPropagation();
       this.logger.log("handleDrop", "found items", { evt, files, imageFiles });
       await this.handleDataTransferList(evt.dataTransfer?.items, evt);
       return;
@@ -78,7 +80,10 @@ export class ImageDrop {
     await this.handleDataTransferList(evt.clipboardData?.items, evt);
   }
 
-  private async handleDataTransferList(dataTransferItems: DataTransferItemList | undefined, evt: { preventDefault: () => void }) {
+  private async handleDataTransferList(
+    dataTransferItems: DataTransferItemList | undefined, 
+    evt: { preventDefault: () => void, stopPropagation: () => void }
+  ) {
     const items = Array.from(dataTransferItems || []);
     // Can only compress images of type "file"
     const images = items.filter(f => f.kind === 'file' && IsMatch(f.type));
@@ -89,6 +94,7 @@ export class ImageDrop {
       return;
     }
     evt.preventDefault();
+    evt.stopPropagation();
     const imageFiles = images.map(image => image.getAsFile());
     await this.pasteFilesIntoQuill(imageFiles);
   }
