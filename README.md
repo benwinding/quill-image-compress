@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/npm/l/quill-image-compress.svg)](https://github.com/benwinding/quill-image-compress/blob/master/LICENSE)
 [![Downloads/week](https://img.shields.io/npm/dm/quill-image-compress.svg)](https://www.npmjs.com/package/quill-image-compress)
 [![Github Issues](https://img.shields.io/github/issues/benwinding/quill-image-compress.svg)](https://github.com/benwinding/quill-image-compress)
-![Build and Publish](https://github.com/benwinding/quill-image-compress/workflows/Build%20and%20Publish/badge.svg)
+![Build and Publish](https://github.com/benwinding/quill-image-compress/actions/workflows/push.yml/badge.svg)
 <!-- [END badges] -->
 
 Quill.js Module which compresses images that are uploaded to the editor
