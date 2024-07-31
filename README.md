@@ -26,7 +26,7 @@ Quill.js Module which compresses images that are uploaded to the editor
 - Compression options [more info](#options)
 - Add multiple images in one drag/paste
 
-_NOTE: :exclamation:you don't need `quill-image-drop-module`, it's included in this package:exclamation:_
+_NOTE: :exclamation: you don't need `quill-image-drop-module`, it's included in this package :exclamation:_
 
 ## Quickstart
 
@@ -57,7 +57,7 @@ const quill = new Quill(editor, {
 ## Quickstart (script tag)
 
 ``` html
-    <script src="https://unpkg.com/quill-image-compress@1.2.11/dist/quill.imageCompressor.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill-image-compress@2.0/dist/quill.imageCompressor.min.js"></script>
     <script>
       Quill.register("modules/imageCompressor", imageCompressor);
       
